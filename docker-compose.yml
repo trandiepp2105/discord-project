@@ -1,0 +1,50 @@
+version: '3.9'
+services:
+  # backend:
+  #   container_name: django_app
+  #   build:
+  #     context: ./backend
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "8000:8000"
+  #   restart: always
+  #   volumes:
+  #     - ./backend:/backend
+  #   command: sh -c "python manage.py runserver 0.0.0.0:8000"
+  #   environment:
+  #     - DB_HOST=db
+  #     - DB_NAME=devdb
+  #     - DB_USER=trandiep
+  #     - DB_PASS=Diep2105@
+  #   depends_on:
+  #     - db
+
+  frontend:
+    container_name: react_app
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    command: sh -c "npm start"
+    ports:
+      - "3000:3000"
+    restart: always
+    volumes:
+      - /frontend/node_modules
+      - ./frontend:/frontend
+    # depends_on:
+    #   - backend
+
+#   db:
+#     container_name: postgres_db
+#     image: postgres:latest
+#     environment:
+#       POSTGRES_USER: trandiep
+#       POSTGRES_PASSWORD: Diep2105@
+#       POSTGRES_DB: devdb
+#     volumes:
+#       - database:/var/lib/postgresql/data
+
+
+
+# volumes:
+#   database:
