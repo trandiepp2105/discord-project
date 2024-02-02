@@ -1,23 +1,23 @@
 version: '3.9'
 services:
-  # backend:
-  #   container_name: django_app
-  #   build:
-  #     context: ./backend
-  #     dockerfile: Dockerfile
-  #   ports:
-  #     - "8000:8000"
-  #   restart: always
-  #   volumes:
-  #     - ./backend:/backend
-  #   command: sh -c "python manage.py runserver 0.0.0.0:8000"
-  #   environment:
-  #     - DB_HOST=db
-  #     - DB_NAME=devdb
-  #     - DB_USER=trandiep
-  #     - DB_PASS=Diep2105@
-  #   depends_on:
-  #     - db
+  backend:
+    container_name: django_app
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    restart: always
+    volumes:
+      - ./backend:/backend
+    command: sh -c "python manage.py runserver 0.0.0.0:8000"
+    # environment:
+    #   - DB_HOST=db
+    #   - DB_NAME=devdb
+    #   - DB_USER=trandiep
+    #   - DB_PASS=Diep2105@
+    # depends_on:
+    #   - db
 
   frontend:
     container_name: react_app
