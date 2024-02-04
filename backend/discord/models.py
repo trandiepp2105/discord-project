@@ -1,49 +1,132 @@
 from django.db import models
+# from django.contrib.auth.models import User, AbstractUser
+
 
 class User(models.Model):
     user_id = models.AutoField(primary_key=True)
     username = models.CharField(max_length=100)
     email = models.EmailField()
-    bỉrthday = models.DateField()
-    password = models.CharField(max_length=100)
-    created_at = models.DateTimeField(auto_now_add=True)
+    hashed_password = models.CharField(max_length=100)
+    date_created = models.DateTimeField(auto_now_add=True)
+    last_login = models.DateTimeField(auto_now=True)
+    # profile_picture = models.ImageField(upload_to='profile_pictures/', blank=True, null=True)
 
     def __str__(self):
         return self.username
+    
+    class Meta:
+        db_table = 'user'
 
-class Group(models.Model):  
-    group_id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=100)
-    description = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return self.name
-
-class Membership(models.Model):
-    membership_id = models.AutoField(primary_key=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    group = models.ForeignKey(Group, on_delete=models.CASCADE)
+class Server(models.Model):
+    server_id = models.AutoField(primary_key=True)
+    server_name = models.CharField(max_length=100)
+    # server_owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    date_created = models.DateTimeField(auto_now_add=True)
+    # server_picture = models.ImageField(upload_to='server_pictures/', blank=True, null=True)
+    server_description = models.TextField(blank=True, null=True)
 
     def __str__(self):
-        return f"{self.user.username} in {self.group.name}"
+        return self.server_name
+    
+    class Meta:
+        db_table = 'server'
+
+class Member(models.Model):
+    ADMIN = 'admin'
+    MODERATOR = 'moderator'
+    MEMBER = 'member'
+    ROLES = [
+        (ADMIN, 'Admin'),
+        (MODERATOR, 'Moderator'),
+        (MEMBER, 'Member')
+    ]
+    member_id = models.AutoField(primary_key=True)
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    server_id = models.ForeignKey(Server, on_delete=models.CASCADE)
+    date_joined = models.DateTimeField(auto_now_add=True)
+    role = models.CharField(max_length=10, choices=ROLES, default=MEMBER)
+
+    def __str__(self):
+        return self.user_id.username
+    
+    class Meta:
+        db_table = 'member'
 
 class Channel(models.Model):
+    TEXT = 'text'
+    VOICE = 'voice'
+    CHOOSES = [
+        (TEXT, 'Text'),
+        (VOICE, 'Voice')
+    ]
     channel_id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=100)
-    description = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    group = models.ForeignKey(Group, on_delete=models.CASCADE)
+    channel_name = models.CharField(max_length=100)
+    server_id = models.ForeignKey(Server, on_delete=models.CASCADE)
+    date_created = models.DateTimeField(auto_now_add=True)
+    channel_type = models.CharField(max_length=5, choices=CHOOSES, default=TEXT)
 
     def __str__(self):
-        return self.name
+        return self.channel_name
+    
+    class Meta:
+        db_table = 'channel'      
+
+class Friend(models.Model):
+    PENDING = 'pending'
+    ACCEPTED = 'accepted'
+    STATUS = [
+        (PENDING, 'Pending'),
+        (ACCEPTED, 'Accepted')
+    ]
+    friend_id = models.AutoField(primary_key=True)
+    user1_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user1_id')
+    user2_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user2_id')
+    date_added = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=10, choices=STATUS, default=PENDING)
+
+    def __str__(self):
+        return self.user_id.username
+    
+    class Meta:
+        db_table = 'friend' 
+
+class FriendChat(models.Model):
+    chat_id = models.AutoField(primary_key=True)
+    user1_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user1_id_chat')
+    user2_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user2_id_chat')
+
+    def __str__(self):
+        return self.user1_id.username + ' and ' + self.user2_id.username
+
+    class Meta:
+        db_table = 'friend_chat'
 
 class Message(models.Model):
     message_id = models.AutoField(primary_key=True)
-    content = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    channel = models.ForeignKey(Channel, on_delete=models.CASCADE)
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    channel_id = models.ForeignKey(Channel, on_delete=models.CASCADE, blank=True, null=True)
+    friend_chat_id = models.ForeignKey(FriendChat, on_delete=models.CASCADE, blank=True, null=True)
+    message = models.TextField()
+    date_sent = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.content
+        return self.user_id.username + ' - ' + self.message + ' - ' + str(self.date_sent)
+    
+    class Meta:
+        db_table = 'message'
+
+class LastSeen(models.Model):
+    last_seen_id = models.AutoField(primary_key=True)
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    channel_id = models.ForeignKey(Channel, on_delete=models.CASCADE, blank=True, null=True)
+    friend_chat_id = models.ForeignKey(FriendChat, on_delete=models.CASCADE, blank=True, null=True)
+    last_seen = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.user_id.username + ' - ' + str(self.last_seen)
+    
+    class Meta:
+        db_table = 'last_seen'
+    
+
+ 
