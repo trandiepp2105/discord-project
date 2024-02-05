@@ -10,14 +10,14 @@ services:
     restart: always
     volumes:
       - ./backend:/backend
-    command: sh -c "python manage.py runserver 0.0.0.0:8000"
-    # environment:
-    #   - DB_HOST=db
-    #   - DB_NAME=devdb
-    #   - DB_USER=trandiep
-    #   - DB_PASS=Diep2105@
-    # depends_on:
-    #   - db
+    command: sh -c "python manage.py runserver 0.0.0.0:8000 && python manage.py makemigrations && python manage.py migrate"
+    environment:
+      - DB_HOST=db
+      - DB_NAME=devdb
+      - DB_USER=user_devdb
+      - DB_PASS=password
+    depends_on:
+      - db
 
   frontend:
     container_name: react_app
@@ -34,17 +34,18 @@ services:
     # depends_on:
     #   - backend
 
-#   db:
-#     container_name: postgres_db
-#     image: postgres:latest
-#     environment:
-#       POSTGRES_USER: trandiep
-#       POSTGRES_PASSWORD: Diep2105@
-#       POSTGRES_DB: devdb
-#     volumes:
-#       - database:/var/lib/postgresql/data
+  db:
+    container_name: mysql_db
+    image: mysql:8.3.0
+    ports:
+      - "3307:3307"
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: devdb
+      MYSQL_USER: user_devdb
+      MYSQL_PASSWORD: password
+    volumes:
+      - database:/var/lib/mysql
 
-
-
-# volumes:
-#   database:
+volumes:
+  database:
