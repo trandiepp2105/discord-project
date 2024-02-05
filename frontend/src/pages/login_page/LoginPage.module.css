@@ -1,0 +1,108 @@
+.wrapperSignUpPage {
+  background-image: url("../../../public/images/signup-bg.png");
+  background-size: cover;
+  min-width: 100vw;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+}
+
+.formContainer {
+  background-color: #313338;
+  width: 784px;
+  margin: 0 auto;
+  color: #b5bac1;
+  padding: 32px;
+  box-sizing: border-box;
+  border-radius: 5px;
+  display: flex;
+}
+
+.mainLoginContainer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+}
+
+.mainLoginContainer .heading {
+  width: 100%;
+  text-align: center;
+  color: white;
+  margin-bottom: 8px;
+}
+
+.mainLoginContainer .welcomeText {
+  width: 100%;
+  text-align: center;
+  font-size: 0.9rem;
+  margin-bottom: 20px;
+}
+
+.mainLoginContainer .inputBlock {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.inputPwdBlock {
+  margin: 0 !important;
+}
+
+.inputBlock .label {
+  font-weight: 500;
+  margin-bottom: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.forgotPwdLink {
+  margin: 5px 0 20px 0;
+}
+
+.registerLink {
+  margin-top: 5px;
+  font-size: 14px;
+}
+
+.verticalSeparator {
+  margin: 0 32px;
+}
+
+.qrLogin {
+  width: 240px;
+  display: flex;
+  flex-direction: column;
+  /* padding: 20px 10px 0 10px; */
+  box-sizing: border-box;
+  align-items: center;
+}
+
+.qrLogin .qrImg {
+  width: 80%;
+  object-fit: cover;
+  background-color: white;
+  border-radius: 5px;
+  margin-top: 20px;
+}
+
+.qrLogin .qrTitle {
+  margin-top: 32px;
+  margin-bottom: 8px;
+}
+
+.qrLogin .qrText {
+  font-size: 15px;
+  text-align: center;
+}
+@media only screen and (max-width: 835px) {
+  .qrLogin,
+  .verticalSeparator {
+    display: none;
+  }
+
+  .formContainer {
+    width: 480px;
+  }
+}

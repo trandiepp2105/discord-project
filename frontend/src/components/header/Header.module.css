@@ -1,0 +1,41 @@
+.container {
+  height: 80px;
+  display: flex;
+  background-color: #404eed;
+  justify-content: space-between;
+  padding: 0 20px;
+  align-items: center;
+}
+
+.navBar {
+  display: flex;
+  width: fit-content;
+}
+
+.navBar .navLink {
+  text-decoration: none;
+  font-weight: 600;
+  color: white;
+  margin: 0 10px;
+}
+
+.loginBtn {
+  color: #23272a;
+  background-color: #fff;
+  border-radius: 40px;
+  padding: 7px 16px;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 24px;
+  border: none;
+  outline: none;
+  cursor: pointer;
+}
+
+.loginBtn:hover {
+  filter: brightness(90%);
+}
+
+.loginBtn:active {
+  filter: brightness(80%);
+}

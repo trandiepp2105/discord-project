@@ -1,23 +1,24 @@
-import logo from './logo.svg';
-import './App.css';
-
+import "./App.css";
+import "./styles/ComponentStyles.css";
+import { Route, Routes, BrowserRouter as Router } from "react-router-dom";
+import Layout from "./pages/Layout";
+import PageNotFound from "./pages/page_not_found/PageNotFound";
+import SignUpPage from "./pages/sign_up_page/SignUpPage";
+import LoginPage from "./pages/login_page/LoginPage";
+import HomePage from "./pages/home_page/HomePage";
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Layout />}>
+            <Route index element={<HomePage />} />
+            <Route path="*" element={<PageNotFound />} />
+            <Route path="signup" element={<SignUpPage />} />
+            <Route path="login" element={<LoginPage />} />
+          </Route>
+        </Routes>
+      </Router>
     </div>
   );
 }
