@@ -1,0 +1,5 @@
+.errorText {
+  margin-top: 3px;
+  color: var(--danger-text-color);
+  font-size: 0.8rem;
+}

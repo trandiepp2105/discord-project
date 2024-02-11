@@ -1,10 +1,17 @@
+//Module import
 import { React, useState } from "react";
-import styles from "./SignUpPage.module.css";
 import classNames from "classnames";
 import { IoIosArrowDown } from "react-icons/io";
 import { Link } from "react-router-dom";
+
+// Css import
+import styles from "./SignUpPage.module.css";
+
+//Components import
 import InputField from "../../components/input_field/InputField";
 import FormButton from "../../components/form_button/FormButton";
+import RequireAsterisk from "../../components/require_asterisk/RequireAsterisk";
+import ErrorText from "../../components/error_text/ErrorText";
 
 function getMonthOptions() {
   //  Create an array of month options for the select input field
@@ -90,6 +97,15 @@ const SignUpPage = () => {
     dayOfBirth: "",
   };
   const [formData, setFormData] = useState(initialFormData);
+
+  const [showErrorText, setShowErrorText] = useState({
+    showEmailError: false,
+    showDisplayNameError: false,
+    showUserNameError: false,
+    showPasswordError: false,
+    showDateOfBirthError: false,
+  });
+
   return (
     <div className={styles.wrapperSignUpPage}>
       <div className={styles.formContainer}>
@@ -98,6 +114,7 @@ const SignUpPage = () => {
         <div className={styles.inputBlock}>
           <label className={styles.label} htmlFor="email">
             EMAIL
+            <RequireAsterisk />
           </label>
           <InputField
             type={"text"}
@@ -107,11 +124,16 @@ const SignUpPage = () => {
               setFormData({ ...formData, email: event.target.value });
             }}
           />
+          <ErrorText
+            text={"Please enter a valid email address."}
+            show={showErrorText.showEmailError}
+          />
         </div>
         {/* Display name field */}
         <div className={styles.inputBlock}>
           <label className={styles.label} htmlFor="displayName">
             DISPLAY NAME
+            <RequireAsterisk />
           </label>
           <InputField
             type="text"
@@ -121,11 +143,16 @@ const SignUpPage = () => {
               setFormData({ ...formData, displayName: event.target.value });
             }}
           />
+          <ErrorText
+            text={"Please enter a displayname."}
+            show={showErrorText.showDisplayNameError}
+          />
         </div>
         {/* User name field */}
         <div className={styles.inputBlock}>
           <label className={styles.label} htmlFor="userName">
             USER NAME
+            <RequireAsterisk />
           </label>
           <InputField
             type="text"
@@ -135,11 +162,16 @@ const SignUpPage = () => {
               setFormData({ ...formData, userName: event.target.value });
             }}
           />
+          <ErrorText
+            text={"Please enter a username."}
+            show={showErrorText.showUserNameError}
+          />
         </div>
         {/* Password fields */}
         <div className={styles.inputBlock}>
           <label className={styles.label} htmlFor="password">
             PASSWORD
+            <RequireAsterisk />
           </label>
           <InputField
             type="password"
@@ -149,11 +181,16 @@ const SignUpPage = () => {
               setFormData({ ...formData, password: event.target.value });
             }}
           />
+          <ErrorText
+            text={"Please enter a valid password."}
+            show={showErrorText.showPasswordError}
+          />
         </div>
         {/* Date of birth field */}
         <div className={styles.inputBlock}>
           <label className={styles.label} htmlFor="dateOfBirth">
             DATE OF BIRTH
+            <RequireAsterisk />
           </label>
           <div className={styles.wrapperSelects}>
             <div
@@ -204,6 +241,10 @@ const SignUpPage = () => {
               <IoIosArrowDown className={styles.arrowBtn} />
             </div>
           </div>
+          <ErrorText
+            text={"Date of birth is required."}
+            show={showErrorText.showDateOfBirthError}
+          />
         </div>
         {/*  */}
         <div className={styles.wrapperOptionalCheckbox}>

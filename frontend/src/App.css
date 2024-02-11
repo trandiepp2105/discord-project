@@ -2,6 +2,7 @@
 
 :root {
   --primary-font: "Varela Round", sans-serif;
+  --danger-text-color: red;
 }
 
 * {

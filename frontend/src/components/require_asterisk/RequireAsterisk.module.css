@@ -1,0 +1,4 @@
+.requireAsterisk {
+  color: var(--danger-text-color);
+  padding-left: 4px;
+}
