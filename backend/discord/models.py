@@ -1,28 +1,37 @@
 from django.db import models
-# from django.contrib.auth.models import User, AbstractUser
+from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import User
+from PIL import Image
 
 
-class User(models.Model):
-    user_id = models.AutoField(primary_key=True)
-    username = models.CharField(max_length=100)
-    email = models.EmailField()
-    hashed_password = models.CharField(max_length=100)
-    date_created = models.DateTimeField(auto_now_add=True)
-    last_login = models.DateTimeField(auto_now=True)
-    # profile_picture = models.ImageField(upload_to='profile_pictures/', blank=True, null=True)
+class UserDiscord(AbstractUser):
+    # user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user_picture = models.ImageField(upload_to='user_pictures', blank=True, null=True, default='user_pictures/avatar.jpg')
+    is_verified = models.BooleanField(default=False)
+
 
     def __str__(self):
-        return self.username
+        return self.user.username
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+        img = Image.open(self.user_picture.path)    
+        if img.height > 300 or img.width > 300:
+            output_size = (300, 300)
+            img.thumbnail(output_size)
+            img.save(self.user_picture.path)
     
     class Meta:
         db_table = 'user'
 
+
 class Server(models.Model):
     server_id = models.AutoField(primary_key=True)
     server_name = models.CharField(max_length=100)
-    # server_owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    # server_owner = models.ForeignKey(UserDiscord, on_delete=models.CASCADE)
     date_created = models.DateTimeField(auto_now_add=True)
-    # server_picture = models.ImageField(upload_to='server_pictures/', blank=True, null=True)
+    server_picture = models.ImageField(upload_to='server_pictures/', blank=True, null=True)
     server_description = models.TextField(blank=True, null=True)
 
     def __str__(self):
@@ -41,7 +50,7 @@ class Member(models.Model):
         (MEMBER, 'Member')
     ]
     member_id = models.AutoField(primary_key=True)
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    user_id = models.ForeignKey(UserDiscord, on_delete=models.CASCADE)
     server_id = models.ForeignKey(Server, on_delete=models.CASCADE)
     date_joined = models.DateTimeField(auto_now_add=True)
     role = models.CharField(max_length=10, choices=ROLES, default=MEMBER)
@@ -79,8 +88,8 @@ class Friend(models.Model):
         (ACCEPTED, 'Accepted')
     ]
     friend_id = models.AutoField(primary_key=True)
-    user1_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user1_id')
-    user2_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user2_id')
+    user1_id = models.ForeignKey(UserDiscord, on_delete=models.CASCADE, related_name='user1_id')
+    user2_id = models.ForeignKey(UserDiscord, on_delete=models.CASCADE, related_name='user2_id')
     date_added = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=10, choices=STATUS, default=PENDING)
 
@@ -92,8 +101,8 @@ class Friend(models.Model):
 
 class FriendChat(models.Model):
     chat_id = models.AutoField(primary_key=True)
-    user1_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user1_id_chat')
-    user2_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user2_id_chat')
+    user1_id = models.ForeignKey(UserDiscord, on_delete=models.CASCADE, related_name='user1_id_chat')
+    user2_id = models.ForeignKey(UserDiscord, on_delete=models.CASCADE, related_name='user2_id_chat')
 
     def __str__(self):
         return self.user1_id.username + ' and ' + self.user2_id.username
@@ -103,7 +112,7 @@ class FriendChat(models.Model):
 
 class Message(models.Model):
     message_id = models.AutoField(primary_key=True)
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    user_id = models.ForeignKey(UserDiscord, on_delete=models.CASCADE)
     channel_id = models.ForeignKey(Channel, on_delete=models.CASCADE, blank=True, null=True)
     friend_chat_id = models.ForeignKey(FriendChat, on_delete=models.CASCADE, blank=True, null=True)
     message = models.TextField()
@@ -117,7 +126,7 @@ class Message(models.Model):
 
 class LastSeen(models.Model):
     last_seen_id = models.AutoField(primary_key=True)
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    user_id = models.ForeignKey(UserDiscord, on_delete=models.CASCADE)
     channel_id = models.ForeignKey(Channel, on_delete=models.CASCADE, blank=True, null=True)
     friend_chat_id = models.ForeignKey(FriendChat, on_delete=models.CASCADE, blank=True, null=True)
     last_seen = models.DateTimeField(auto_now=True)
