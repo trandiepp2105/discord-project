@@ -16,6 +16,7 @@ services:
       - DB_NAME=devdb
       - DB_USER=user_devdb
       - DB_PASS=password
+      - PORT=3306
     depends_on:
       - db
 
@@ -38,7 +39,7 @@ services:
     container_name: mysql_db
     image: mysql:8.3.0
     ports:
-      - "3307:3307"
+      - "3306:3306"
     environment:
       MYSQL_ROOT_PASSWORD: password
       MYSQL_DATABASE: devdb
