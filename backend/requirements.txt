@@ -6,3 +6,4 @@ djangorestframework
 djangorestframework-simplejwt
 Pillow
 pytz
+cryptography
