@@ -12,4 +12,5 @@ urlpatterns = [
     path('signup/', views.SignUp, name='signup'),
     path('login/', views.Login , name='login'),
     path('verify/<uidb64>/<token>/', views.Verify, name='verify'),
+    path('csrf/', views.csrf, name='csrf'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
