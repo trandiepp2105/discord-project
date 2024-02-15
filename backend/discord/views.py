@@ -13,6 +13,7 @@ from django.contrib.auth.tokens import default_token_generator
 from rest_framework.permissions import IsAuthenticated
 from django.middleware.csrf import get_token
 from rest_framework.views import APIView
+from rest_framework.permissions import AllowAny
 
 
 class UserDiscordViewSet(viewsets.ModelViewSet):
@@ -20,16 +21,18 @@ class UserDiscordViewSet(viewsets.ModelViewSet):
     serializer_class = UserDiscordSerializer
 
 class csrf(APIView):
+    authentication_classes = []
+    permission_classes = [AllowAny]
     def get(self, request):
         return Response({'csrfToken': get_token(request)})
 
 class SignUp(APIView):
+    authentication_classes = []
+    permission_classes = [AllowAny]
     def post(self, request):
-        form = SignUpForm(request.POST)
-        if form.is_valid():
-            user = form.save(commit=False)
-            user.is_verified = False
-            user.save()
+        serializer = UserDiscordSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save(is_verified=False)
             uid = urlsafe_base64_encode(force_bytes(user.pk))
             token = default_token_generator.make_token(user)
             url = f'http://{request.get_host()}/verify/{uid}/{token}'
@@ -37,9 +40,11 @@ class SignUp(APIView):
             send_mail('Verify your email', email, settings.EMAIL_HOST_USER, [user.email], fail_silently=False)
             return Response({'message': 'Please check your email to verify your account'}, status=status.HTTP_201_CREATED)
         else:
-            return Response({'error': 'Invalid form'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 class Verify(APIView):
+    authentication_classes = []
+    permission_classes = [AllowAny]
     def get(self, request, uidb64, token):
         try:
             uid = force_bytes(urlsafe_base64_decode(uidb64))
@@ -54,13 +59,15 @@ class Verify(APIView):
             return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
         
 class Login(APIView):
+    authentication_classes = []
+    permission_classes = [AllowAny]
     def post(self, request):
         if request.user.is_authenticated:
             return Response({'error': 'You are already logged in'}, status=status.HTTP_400_BAD_REQUEST)
-        form = LoginForm(request.POST)
-        if form.is_valid():
-            username = form.cleaned_data['username']
-            password = form.cleaned_data['password']
+        serializer = LoginForm(data=request.data)
+        if serializer.is_valid():
+            username = serializer.data['username']
+            password = serializer.data['password']
             user = authenticate(request, username=username, password=password)
             if user is not None:
                 refresh = RefreshToken.for_user(user)
@@ -70,7 +77,7 @@ class Login(APIView):
             else:
                 return Response({'error': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
         else:
-            return Response({'error': 'Invalid form'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class Logout(APIView):
     permission_classes = (IsAuthenticated,)
