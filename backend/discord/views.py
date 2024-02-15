@@ -1,10 +1,9 @@
 from rest_framework import viewsets, generics, status, views
 from .models import UserDiscord
-from .serializers import UserDiscordSerializer
+from .serializers import UserDiscordSerializer, LoginSerializer, CreateServerSerializer, CreateChannelSerializer
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
-from .form import SignUpForm, LoginForm
 from django.core.mail import send_mail
 from django.conf import settings
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
@@ -14,17 +13,23 @@ from rest_framework.permissions import IsAuthenticated
 from django.middleware.csrf import get_token
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny
+from .models import Server
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
 
 
 class UserDiscordViewSet(viewsets.ModelViewSet):
+    permission_classes = []
     queryset = UserDiscord.objects.all()
     serializer_class = UserDiscordSerializer
+    def post(self, request):
+        return Response({'error': 'Method not allowed'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
-class csrf(APIView):
-    authentication_classes = []
-    permission_classes = [AllowAny]
-    def get(self, request):
-        return Response({'csrfToken': get_token(request)})
+# class csrf(APIView):
+#     authentication_classes = []
+#     permission_classes = [AllowAny]
+#     def get(self, request):
+#         return Response({'csrfToken': get_token(request)})
 
 class SignUp(APIView):
     authentication_classes = []
@@ -35,9 +40,12 @@ class SignUp(APIView):
             user = serializer.save(is_verified=False)
             uid = urlsafe_base64_encode(force_bytes(user.pk))
             token = default_token_generator.make_token(user)
-            url = f'http://{request.get_host()}/verify/{uid}/{token}'
+            host = '127.0.0.1:3000'
+            url = f'http://{host}/verify/{uid}/{token}'
             email = f'Hi, {user.username}! Please click the link to verify your email: {url}'
-            send_mail('Verify your email', email, settings.EMAIL_HOST_USER, [user.email], fail_silently=False)
+            html_message = render_to_string('discord/email.html', {'url': url})
+            plain_message = strip_tags(html_message)
+            send_mail('Verify your email', plain_message, settings.EMAIL_HOST_USER, [user.email], html_message=html_message)
             return Response({'message': 'Please check your email to verify your account'}, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -64,7 +72,7 @@ class Login(APIView):
     def post(self, request):
         if request.user.is_authenticated:
             return Response({'error': 'You are already logged in'}, status=status.HTTP_400_BAD_REQUEST)
-        serializer = LoginForm(data=request.data)
+        serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
             username = serializer.data['username']
             password = serializer.data['password']
@@ -89,3 +97,28 @@ class Logout(APIView):
             return Response({'message': 'You have been logged out'}, status=status.HTTP_200_OK)
         except:
             return Response({'error': 'Can not log out'}, status=status.HTTP_400_BAD_REQUEST)
+        
+class CreateGroup(APIView):
+    parser_classes = (IsAuthenticated,)
+    def post(self, request):
+        user = request.user
+        serializer = CreateServerSerializer(data=request.data)
+        if serializer.is_valid():
+            group = serializer.save(owner_id=user)
+            return Response({'message': 'Group created successfully'}, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class CreateChannel(APIView):
+    parser_classes = (IsAuthenticated,)
+    def post(self, request):
+        user = request.user
+        server = Server.objects.get(server_id=request.data['server_id'])
+        if user != server.owner_id:
+            return Response({'error': 'You are not the owner of this group'}, status=status.HTTP_400_BAD_REQUEST)
+        serializer = CreateChannelSerializer(data=request.data)
+        if serializer.is_valid():
+            channel = serializer.save()
+            return Response({'message': 'Channel created successfully'}, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
