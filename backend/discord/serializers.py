@@ -18,7 +18,7 @@ class LoginSerializer(serializers.Serializer):
 class CreateServerSerializer(serializers.Serializer):
     class Meta:
         model = UserDiscord
-        fields = ['server_name', 'server_picture', 'owner_id']
+        fields = ['server_name', 'server_picture']
     
     def create(self, validated_data):
         server = Server.objects.create(**validated_data)
