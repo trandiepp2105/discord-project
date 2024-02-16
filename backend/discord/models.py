@@ -6,7 +6,7 @@ from PIL import Image
 
 class UserDiscord(AbstractUser):
     # user = models.OneToOneField(User, on_delete=models.CASCADE)
-    user_picture = models.ImageField(upload_to='user_pictures', blank=True, null=True, default='user_pictures/avatar.jpg')
+    user_picture = models.ImageField(upload_to='user_pictures', blank=True, null=True, default='user_pictures/default.jpg')
     is_verified = models.BooleanField(default=False)
 
 
@@ -32,8 +32,9 @@ class Server(models.Model):
     server_name = models.CharField(max_length=100)
     # server_owner = models.ForeignKey(UserDiscord, on_delete=models.CASCADE)
     date_created = models.DateTimeField(auto_now_add=True)
-    server_picture = models.ImageField(upload_to='server_pictures/', blank=True, null=True)
-    server_description = models.TextField(blank=True, null=True)
+    server_picture = models.ImageField(upload_to='server_pictures/', blank=True, null=True, default='server_pictures/default.jpg')
+    # server_description = models.TextField(blank=True, null=True)
+    owner_id = models.ForeignKey(UserDiscord, on_delete=models.CASCADE, related_name='owner_id')
 
     def __str__(self):
         return self.server_name
