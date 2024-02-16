@@ -1,0 +1,41 @@
+.wrapperVerifyEmailPage {
+  background-image: url("../../../public/images/signup-bg.png");
+  background-size: cover;
+  min-width: 100vw;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.mainContent {
+  width: 480px;
+  aspect-ratio: 2 / 2;
+  background-color: white;
+  margin: auto;
+  border-radius: 10px;
+}
+
+.emailImage {
+  width: 100%;
+  text-align: center;
+  padding-top: 100px;
+}
+
+.emailImg {
+  width: 30%;
+  object-fit: cover;
+}
+
+.title {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.loginBtn {
+  width: 80%;
+  margin: 0 10%;
+  margin-top: 20px;
+}

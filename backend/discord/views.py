@@ -39,14 +39,14 @@ class SignUp(APIView):
             uid = urlsafe_base64_encode(force_bytes(user.pk))
             token = default_token_generator.make_token(user)
             host = '127.0.0.1:3000'
-            url = f'http://{host}/verify/{uid}/{token}'
+            url = f'http://{host}/verify-email/{uid}/{token}'
             html_message = render_to_string('discord/email.html', {'url': url})
             plain_message = strip_tags(html_message)
             send_mail('Verify your email', plain_message, settings.EMAIL_HOST_USER, [user.email], html_message=html_message)
             return Response({'message': 'Please check your email to verify your account'}, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
 class Verify(APIView):
     authentication_classes = []
     permission_classes = [AllowAny]
@@ -62,7 +62,7 @@ class Verify(APIView):
             return Response({'message': 'Your email has been verified'}, status=status.HTTP_200_OK)
         else:
             return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
-        
+
 class Login(APIView):
     authentication_classes = []
     permission_classes = [AllowAny]
@@ -94,7 +94,7 @@ class Logout(APIView):
             return Response({'message': 'You have been logged out'}, status=status.HTTP_200_OK)
         except:
             return Response({'error': 'Can not log out'}, status=status.HTTP_400_BAD_REQUEST)
-        
+
 class CreateGroup(APIView):
     parser_classes = (IsAuthenticated,)
     def post(self, request):
