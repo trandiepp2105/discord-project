@@ -17,15 +17,15 @@ const WatingForAuthPage = () => {
     const handleMessage = async (event) => {
       // console.log(event.newValue);
       if (event.key === "verified" && event.newValue === "true") {
-        sleep(3000);
+        await sleep(3000);
         history("/login");
       }
     };
     // console.log("useEffect");
     window.addEventListener("storage", handleMessage);
-    // return () => {
-    //   window.removeEventListener("storage", handleMessage);
-    // };
+    return () => {
+      window.removeEventListener("storage", handleMessage);
+    };
   }, [history]);
   return (
     <div className={styles.wrapperVerifyEmailPage}>
