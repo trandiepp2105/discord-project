@@ -16,7 +16,7 @@ from rest_framework.permissions import AllowAny
 from .models import Server
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
-
+from datetime import date
 
 class UserDiscordViewSet(viewsets.ModelViewSet):
     permission_classes = []
@@ -34,19 +34,21 @@ class SignUp(APIView):
     permission_classes = [AllowAny]
     def post(self, request):
         serializer = UserDiscordSerializer(data=request.data)
+        # day = request.data['date_of_birth'].split('/')
+        # day_of_birth = date(int(day[2]), int(day[1]), int(day[0]))
         if serializer.is_valid():
             user = serializer.save(is_verified=False)
             uid = urlsafe_base64_encode(force_bytes(user.pk))
             token = default_token_generator.make_token(user)
             host = '127.0.0.1:3000'
-            url = f'http://{host}/verify/{uid}/{token}'
+            url = f'http://{host}/verify-email/{uid}/{token}'
             html_message = render_to_string('discord/email.html', {'url': url})
             plain_message = strip_tags(html_message)
             send_mail('Verify your email', plain_message, settings.EMAIL_HOST_USER, [user.email], html_message=html_message)
             return Response({'message': 'Please check your email to verify your account'}, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
 class Verify(APIView):
     authentication_classes = []
     permission_classes = [AllowAny]
@@ -62,7 +64,7 @@ class Verify(APIView):
             return Response({'message': 'Your email has been verified'}, status=status.HTTP_200_OK)
         else:
             return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
-        
+
 class Login(APIView):
     authentication_classes = []
     permission_classes = [AllowAny]
@@ -96,13 +98,13 @@ class Logout(APIView):
             return Response({'error': 'Can not log out'}, status=status.HTTP_400_BAD_REQUEST)
         
 class ServerViewSet(APIView):
-    permission_classes = []
+    permission_classes = (IsAuthenticated,)
     def post(self, request):
         user = request.user
         serializer = CreateServerSerializer(data=request.data)
         if serializer.is_valid():
             group = serializer.save()
-            create_member = MemberSerializer(data={'user_id': user.id, 'server_id': group.server_id, 'role': 'owner'})
+            create_member = MemberSerializer(data={'user_id': user.id, 'server_id': group.server_id, 'role': 'admin'})
             if create_member.is_valid():
                 create_member.save()
             else:

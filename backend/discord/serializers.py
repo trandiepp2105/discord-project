@@ -4,7 +4,7 @@ from .models import UserDiscord, Server, Channel, Member, Friend, FriendChat
 class UserDiscordSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserDiscord
-        fields = ['username', 'email', 'password', 'is_verified']
+        fields = ['username', 'email', 'password', 'is_verified', 'display_name', 'date_of_birth']
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):

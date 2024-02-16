@@ -8,20 +8,22 @@ class UserDiscord(AbstractUser):
     # user = models.OneToOneField(User, on_delete=models.CASCADE)
     user_picture = models.ImageField(upload_to='user_pictures', blank=True, null=True, default='user_pictures/default.jpg')
     is_verified = models.BooleanField(default=False)
-
+    display_name = models.CharField(max_length=100, blank=True, null=True)
+    date_of_birth = models.DateField(blank=True, null=True)
 
     def __str__(self):
+        # return self.user.username
         return self.username
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
 
-        img = Image.open(self.user_picture.path)    
+        img = Image.open(self.user_picture.path)
         if img.height > 300 or img.width > 300:
             output_size = (300, 300)
             img.thumbnail(output_size)
             img.save(self.user_picture.path)
-    
+
     class Meta:
         db_table = 'user'
 
@@ -36,7 +38,7 @@ class Server(models.Model):
 
     def __str__(self):
         return self.server_name
-    
+
     class Meta:
         db_table = 'server'
 
@@ -57,7 +59,7 @@ class Member(models.Model):
 
     def __str__(self):
         return self.user_id.username
-    
+
     class Meta:
         db_table = 'member'
 
@@ -76,9 +78,9 @@ class Channel(models.Model):
 
     def __str__(self):
         return self.channel_name
-    
+
     class Meta:
-        db_table = 'channel'      
+        db_table = 'channel'
 
 class Friend(models.Model):
     PENDING = 'pending'
@@ -95,9 +97,9 @@ class Friend(models.Model):
 
     def __str__(self):
         return self.user_id.username
-    
+
     class Meta:
-        db_table = 'friend' 
+        db_table = 'friend'
 
 class FriendChat(models.Model):
     chat_id = models.AutoField(primary_key=True)
@@ -120,7 +122,7 @@ class Message(models.Model):
 
     def __str__(self):
         return self.user_id.username + ' - ' + self.message + ' - ' + str(self.date_sent)
-    
+
     class Meta:
         db_table = 'message'
 
@@ -133,9 +135,8 @@ class LastSeen(models.Model):
 
     def __str__(self):
         return self.user_id.username + ' - ' + str(self.last_seen)
-    
+
     class Meta:
         db_table = 'last_seen'
-    
 
- 
+

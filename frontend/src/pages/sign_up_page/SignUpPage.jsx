@@ -263,7 +263,7 @@ const SignUpPage = () => {
         </div>
 
         {/*  Submit button */}
-        <FormButton type={"submit"} text={"Continue"} />
+        <FormButton type={"submit"} text={"Continue"} onClick={onFormSubmit} />
         {/* <button type="submit" className={styles.submitBtn}>
           Continue
         </button> */}
