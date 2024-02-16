@@ -1,6 +1,6 @@
 from rest_framework import viewsets, generics, status, views
 from .models import UserDiscord
-from .serializers import UserDiscordSerializer, LoginSerializer, CreateServerSerializer, CreateChannelSerializer
+from .serializers import UserDiscordSerializer, LoginSerializer, CreateServerSerializer, CreateChannelSerializer, MemberSerializer
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
@@ -95,13 +95,18 @@ class Logout(APIView):
         except:
             return Response({'error': 'Can not log out'}, status=status.HTTP_400_BAD_REQUEST)
         
-class CreateGroup(APIView):
-    parser_classes = (IsAuthenticated,)
+class ServerViewSet(APIView):
+    permission_classes = []
     def post(self, request):
         user = request.user
         serializer = CreateServerSerializer(data=request.data)
         if serializer.is_valid():
             group = serializer.save()
+            create_member = MemberSerializer(data={'user_id': user.id, 'server_id': group.server_id, 'role': 'owner'})
+            if create_member.is_valid():
+                create_member.save()
+            else:
+                return Response(create_member.errors, status=status.HTTP_400_BAD_REQUEST)
             return Response({'message': 'Group created successfully'}, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

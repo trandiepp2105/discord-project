@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import UserDiscord, Server, Channel
+from .models import UserDiscord, Server, Channel, Member, Friend, FriendChat
 
 class UserDiscordSerializer(serializers.ModelSerializer):
     class Meta:
@@ -32,3 +32,12 @@ class CreateChannelSerializer(serializers.Serializer):
     def create(self, validated_data):
         channel = Channel.objects.create(**validated_data)
         return channel
+    
+class MemberSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Member
+        fields = ['user_id', 'server_id', 'role']
+
+    def create(self, validated_data):
+        member = Member.objects.create(**validated_data)
+        return member
