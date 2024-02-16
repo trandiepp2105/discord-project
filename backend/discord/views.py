@@ -22,8 +22,6 @@ class UserDiscordViewSet(viewsets.ModelViewSet):
     permission_classes = []
     queryset = UserDiscord.objects.all()
     serializer_class = UserDiscordSerializer
-    def post(self, request):
-        return Response({'error': 'Method not allowed'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 # class csrf(APIView):
 #     authentication_classes = []
@@ -42,7 +40,6 @@ class SignUp(APIView):
             token = default_token_generator.make_token(user)
             host = '127.0.0.1:3000'
             url = f'http://{host}/verify/{uid}/{token}'
-            email = f'Hi, {user.username}! Please click the link to verify your email: {url}'
             html_message = render_to_string('discord/email.html', {'url': url})
             plain_message = strip_tags(html_message)
             send_mail('Verify your email', plain_message, settings.EMAIL_HOST_USER, [user.email], html_message=html_message)
@@ -104,7 +101,7 @@ class CreateGroup(APIView):
         user = request.user
         serializer = CreateServerSerializer(data=request.data)
         if serializer.is_valid():
-            group = serializer.save(owner_id=user)
+            group = serializer.save()
             return Response({'message': 'Group created successfully'}, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

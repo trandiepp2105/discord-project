@@ -34,7 +34,6 @@ class Server(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     server_picture = models.ImageField(upload_to='server_pictures/', blank=True, null=True, default='server_pictures/default.jpg')
     # server_description = models.TextField(blank=True, null=True)
-    owner_id = models.ForeignKey(UserDiscord, on_delete=models.CASCADE, related_name='owner_id')
 
     def __str__(self):
         return self.server_name
