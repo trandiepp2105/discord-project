@@ -10,6 +10,23 @@ const WatingForAuthPage = () => {
   const handleSubmit = () => {
     history("/login");
   };
+  React.useEffect(() => {
+    function sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+    const handleMessage = async (event) => {
+      // console.log(event.newValue);
+      if (event.key === "verified" && event.newValue === "true") {
+        sleep(3000);
+        history("/login");
+      }
+    };
+    // console.log("useEffect");
+    window.addEventListener("storage", handleMessage);
+    // return () => {
+    //   window.removeEventListener("storage", handleMessage);
+    // };
+  }, [history]);
   return (
     <div className={styles.wrapperVerifyEmailPage}>
       <div className={styles.mainContent}>

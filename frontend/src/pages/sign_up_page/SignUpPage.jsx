@@ -1,5 +1,7 @@
 //Module import
-import { React, useState } from "react";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import classNames from "classnames";
 import { IoIosArrowDown } from "react-icons/io";
 import { Link } from "react-router-dom";
@@ -94,7 +96,11 @@ const SignUpPage = () => {
     displayName: "",
     userName: "",
     password: "",
-    dayOfBirth: "",
+    dayOfBirth: {
+      day: "",
+      month: "",
+      year: "",
+    },
   };
   const [formData, setFormData] = useState(initialFormData);
 
@@ -106,185 +112,259 @@ const SignUpPage = () => {
     showDateOfBirthError: false,
   });
 
+  const checkInputFields = (formData) => {
+    let errorFields = {
+      showEmailError: !formData.email,
+      showDisplayNameError: !formData.displayName,
+      showUserNameError: !formData.userName,
+      showPasswordError: !formData.password,
+      showDateOfBirthError:
+        !formData.dayOfBirth.day ||
+        !formData.dayOfBirth.month ||
+        !formData.dayOfBirth.year,
+    };
+    setShowErrorText(errorFields);
+    return Object.values(errorFields).every((value) => !value);
+  };
+  //history use to navigate to new page
+  const history = useNavigate();
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    const isFormValid = checkInputFields(formData);
+    if (isFormValid) {
+      const endpoint = "http://127.0.0.1:8000/signup/";
+      const nextPage = "/waiting-for-email-verification";
+      const body = {
+        username: formData.userName,
+        email: formData.email,
+        password: formData.password,
+        display_name: formData.displayName,
+        date_of_birth: `${formData.dayOfBirth.year}-${formData.dayOfBirth.month.padStart(2, '0')}-${formData.dayOfBirth.day.padStart(2, '0')}`,
+        // date_of_birth: formData.dayOfBirth,
+      };
+      console.log(body);
+      axios
+        .post(endpoint, body)
+        .then((res) => {
+          console.log(res);
+          console.log(res.data);
+        })
+        .then(() => {
+          history(nextPage);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    }
+  };
+  
   return (
     <div className={styles.wrapperSignUpPage}>
       <div className={styles.formContainer}>
         <h3 className={styles.heading}>Create an account</h3>
         {/* Email field */}
-        <div className={styles.inputBlock}>
-          <label className={styles.label} htmlFor="email">
-            EMAIL
-            <RequireAsterisk />
-          </label>
-          <InputField
-            type={"text"}
-            id="email"
-            name={"email"}
-            onchange={(event) => {
-              setFormData({ ...formData, email: event.target.value });
-            }}
-          />
-          <ErrorText
-            text={"Please enter a valid email address."}
-            show={showErrorText.showEmailError}
-          />
-        </div>
-        {/* Display name field */}
-        <div className={styles.inputBlock}>
-          <label className={styles.label} htmlFor="displayName">
-            DISPLAY NAME
-            <RequireAsterisk />
-          </label>
-          <InputField
-            type="text"
-            id="displayName"
-            name="displayName"
-            onchange={(event) => {
-              setFormData({ ...formData, displayName: event.target.value });
-            }}
-          />
-          <ErrorText
-            text={"Please enter a displayname."}
-            show={showErrorText.showDisplayNameError}
-          />
-        </div>
-        {/* User name field */}
-        <div className={styles.inputBlock}>
-          <label className={styles.label} htmlFor="userName">
-            USER NAME
-            <RequireAsterisk />
-          </label>
-          <InputField
-            type="text"
-            id="userName"
-            name="userName"
-            onchange={(event) => {
-              setFormData({ ...formData, userName: event.target.value });
-            }}
-          />
-          <ErrorText
-            text={"Please enter a username."}
-            show={showErrorText.showUserNameError}
-          />
-        </div>
-        {/* Password fields */}
-        <div className={styles.inputBlock}>
-          <label className={styles.label} htmlFor="password">
-            PASSWORD
-            <RequireAsterisk />
-          </label>
-          <InputField
-            type="password"
-            id="password"
-            name="password"
-            onchange={(event) => {
-              setFormData({ ...formData, password: event.target.value });
-            }}
-          />
-          <ErrorText
-            text={"Please enter a valid password."}
-            show={showErrorText.showPasswordError}
-          />
-        </div>
-        {/* Date of birth field */}
-        <div className={styles.inputBlock}>
-          <label className={styles.label} htmlFor="dateOfBirth">
-            DATE OF BIRTH
-            <RequireAsterisk />
-          </label>
-          <div className={styles.wrapperSelects}>
-            <div
-              className={classNames(
-                styles.wrapperSelectItem,
-                styles.wrapperSelectMonth
-              )}
-            >
-              <select
-                className={classNames(styles.selectItem)}
-                name="month"
-                id="month"
-              >
-                {getMonthOptions()}
-              </select>
-              <IoIosArrowDown className={styles.arrowBtn} />
-            </div>
-
-            <div
-              className={classNames(
-                styles.wrapperSelectItem,
-                styles.wrapperSelectDay
-              )}
-            >
-              <select
-                className={classNames(styles.selectItem)}
-                name="day"
-                id="day"
-              >
-                {getDayOptions(31)}
-              </select>
-              <IoIosArrowDown className={styles.arrowBtn} />
-            </div>
-
-            <div
-              className={classNames(
-                styles.wrapperSelectItem,
-                styles.wrapperSelectYear
-              )}
-            >
-              <select
-                className={classNames(styles.selectItem)}
-                name="year"
-                id="year"
-              >
-                {getYearOptions()}
-              </select>
-              <IoIosArrowDown className={styles.arrowBtn} />
-            </div>
-          </div>
-          <ErrorText
-            text={"Date of birth is required."}
-            show={showErrorText.showDateOfBirthError}
-          />
-        </div>
-        {/*  */}
-        <div className={styles.wrapperOptionalCheckbox}>
-          <div className={styles.customCheckbox}>
-            <input
-              className={styles.inputCheckbox}
-              type="checkbox"
-              name="optCheckbox"
-              id="optCheckbox"
+        <form action="" onSubmit={handleSubmit}>
+          <div className={styles.inputBlock}>
+            <label className={styles.label} htmlFor="email">
+              EMAIL
+              <RequireAsterisk />
+            </label>
+            <InputField
+              type={"text"}
+              id="email"
+              name={"email"}
+              onChange={(event) => {
+                const email = event.target.value;
+                setFormData({ ...formData, email: email });
+              }}
+            />
+            <ErrorText
+              text={"Please enter a valid email address."}
+              show={showErrorText.showEmailError}
             />
           </div>
-          <label className={styles.optionalText} htmlFor="optCheckbox">
-            (Optional) It's okay to send me emails with Discord updates, tips,
-            and specials offers. You can opt out any time.
-          </label>
-        </div>
+          {/* Display name field */}
+          <div className={styles.inputBlock}>
+            <label className={styles.label} htmlFor="displayName">
+              DISPLAY NAME
+              <RequireAsterisk />
+            </label>
+            <InputField
+              type="text"
+              id="displayName"
+              name="displayName"
+              onChange={(event) => {
+                const displayName = event.target.value;
+                setFormData({ ...formData, displayName: displayName });
+              }}
+            />
+            <ErrorText
+              text={"Please enter a displayname."}
+              show={showErrorText.showDisplayNameError}
+            />
+          </div>
+          {/* User name field */}
+          <div className={styles.inputBlock}>
+            <label className={styles.label} htmlFor="userName">
+              USER NAME
+              <RequireAsterisk />
+            </label>
+            <InputField
+              type="text"
+              id="userName"
+              name="userName"
+              onChange={(event) => {
+                const userName = event.target.value;
+                setFormData({ ...formData, userName: userName });
+              }}
+            />
+            <ErrorText
+              text={"Please enter a username."}
+              show={showErrorText.showUserNameError}
+            />
+          </div>
+          {/* Password fields */}
+          <div className={styles.inputBlock}>
+            <label className={styles.label} htmlFor="password">
+              PASSWORD
+              <RequireAsterisk />
+            </label>
+            <InputField
+              type="password"
+              id="password"
+              name="password"
+              onChange={(event) => {
+                const password = event.target.value;
+                setFormData({ ...formData, password: password });
+              }}
+            />
+            <ErrorText
+              text={"Please enter a valid password."}
+              show={showErrorText.showPasswordError}
+            />
+          </div>
+          {/* Date of birth field */}
+          <div className={styles.inputBlock}>
+            <label className={styles.label} htmlFor="dateOfBirth">
+              DATE OF BIRTH
+              <RequireAsterisk />
+            </label>
+            <div className={styles.wrapperSelects}>
+              <div
+                className={classNames(
+                  styles.wrapperSelectItem,
+                  styles.wrapperSelectMonth
+                )}
+              >
+                <select
+                  className={classNames(styles.selectItem)}
+                  name="month"
+                  id="month"
+                  onChange={(event) => {
+                    const month = event.target.value;
+                    setFormData({
+                      ...formData,
+                      dayOfBirth: { ...formData.dayOfBirth, month: month },
+                    });
+                  }}
+                >
+                  {getMonthOptions()}
+                </select>
+                <IoIosArrowDown className={styles.arrowBtn} />
+              </div>
 
-        {/*  Submit button */}
-        <FormButton type={"submit"} text={"Continue"} onClick={onFormSubmit} />
-        {/* <button type="submit" className={styles.submitBtn}>
+              <div
+                className={classNames(
+                  styles.wrapperSelectItem,
+                  styles.wrapperSelectDay
+                )}
+              >
+                <select
+                  className={classNames(styles.selectItem)}
+                  name="day"
+                  id="day"
+                  onChange={(event) => {
+                    const day = event.target.value;
+                    setFormData({
+                      ...formData,
+                      dayOfBirth: { ...formData.dayOfBirth, day: day },
+                    });
+                  }}
+                >
+                  {getDayOptions(31)}
+                </select>
+                <IoIosArrowDown className={styles.arrowBtn} />
+              </div>
+
+              <div
+                className={classNames(
+                  styles.wrapperSelectItem,
+                  styles.wrapperSelectYear
+                )}
+              >
+                <select
+                  className={classNames(styles.selectItem)}
+                  name="year"
+                  id="year"
+                  onChange={(event) => {
+                    const year = event.target.value;
+                    setFormData({
+                      ...formData,
+                      dayOfBirth: { ...formData.dayOfBirth, year: year },
+                    });
+                  }}
+                >
+                  {getYearOptions()}
+                </select>
+                <IoIosArrowDown className={styles.arrowBtn} />
+              </div>
+            </div>
+            <ErrorText
+              text={"Date of birth is required."}
+              show={showErrorText.showDateOfBirthError}
+            />
+          </div>
+          {/*  */}
+          <div className={styles.wrapperOptionalCheckbox}>
+            <div className={styles.customCheckbox}>
+              <input
+                className={styles.inputCheckbox}
+                type="checkbox"
+                name="optCheckbox"
+                id="optCheckbox"
+              />
+            </div>
+            <label className={styles.optionalText} htmlFor="optCheckbox">
+              (Optional) It's okay to send me emails with Discord updates, tips,
+              and specials offers. You can opt out any time.
+            </label>
+          </div>
+
+          {/*  Submit button */}
+          <FormButton type={"submit"} text={"Continue"} />
+          {/* <button type="submit" className={styles.submitBtn}>
           Continue
         </button> */}
-        {/* Term and policy btn */}
-        <p className={styles.policyText}>
-          By registering, you agree to Discord's{" "}
-          <Link to="/" className={classNames(styles.policyLink, "text-link")}>
-            Term of Service
-          </Link>{" "}
-          and{" "}
-          <Link to="/" className={classNames(styles.policyLink, "text-link")}>
-            Privacy Policy
-          </Link>
-        </p>
+          {/* Term and policy btn */}
+          <p className={styles.policyText}>
+            By registering, you agree to Discord's{" "}
+            <Link to="/" className={classNames(styles.policyLink, "text-link")}>
+              Term of Service
+            </Link>{" "}
+            and{" "}
+            <Link to="/" className={classNames(styles.policyLink, "text-link")}>
+              Privacy Policy
+            </Link>
+          </p>
 
-        {/* Navigate to login page. */}
-        <div className={styles.navigateBtn}>
-          <Link to={"/login"} className="text-link">
-            Already have an account?
-          </Link>
-        </div>
+          {/* Navigate to login page. */}
+          <div className={styles.navigateBtn}>
+            <Link to={"/login"} className="text-link">
+              Already have an account?
+            </Link>
+          </div>
+        </form>
       </div>
     </div>
   );
