@@ -187,3 +187,9 @@ CORS_ALLOWED_ORIGINS = [
 
 # cors header
 CORS_ORIGIN_ALLOW_ALL = True
+
+# auth backends
+AUTHENTICATION_BACKENDS = [
+    'discord.auth.EmailOrUsernameModelBackend',
+    # 'django.contrib.auth.backends.ModelBackend',
+]

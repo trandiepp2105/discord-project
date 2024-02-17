@@ -10,7 +10,7 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes
 from django.contrib.auth.tokens import default_token_generator
 from rest_framework.permissions import IsAuthenticated
-from django.middleware.csrf import get_token
+# from django.middleware.csrf import get_token
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny
 from .models import Server
@@ -80,9 +80,13 @@ class Login(APIView):
                 refresh = RefreshToken.for_user(user)
                 access_token = str(refresh.access_token)
                 refresh_token = str(refresh)
-                return Response({'access': access_token, 'refresh': refresh_token}, status=status.HTTP_200_OK)
+                response = Response({'message':'Login_success!'}, status=status.HTTP_200_OK)
+                response.set_cookie('jwt_token', access_token, httponly=True, secure=True)
+                response.set_cookie('jwt_refresh', refresh_token, httponly=True, secure=True)
+                return response
+            
             else:
-                return Response({'error': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'error': 'Invalid credentials'}, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
