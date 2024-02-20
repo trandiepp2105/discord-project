@@ -1,15 +1,58 @@
 import { React, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import classNames from "classnames";
 import styles from "./LoginPage.module.css";
 import InputField from "../../components/input_field/InputField";
 import FormButton from "../../components/form_button/FormButton";
+
+
+
 const LoginPage = () => {
   const initialFormData = {
     emailOrPhone: "",
     password: "",
   };
   const [formData, setFormData] = useState(initialFormData);
+  const checkInputFields = (formdata) => {
+    if (formdata.emailOrPhone && formdata.password) {
+      return true;
+    }
+    return false;
+  };
+  const history = useNavigate();
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    console.log(formData);
+    if(checkInputFields(formData)){
+      const endpoint = "http://127.0.0.1:8000/login/";
+      const data = {
+        username: formData.emailOrPhone,
+        password: formData.password,
+      };
+      console.log(data);
+      fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("HTTP error, status = " + response.status);
+          }
+          return response.json();
+        
+        })
+        .then((data) => {
+          console.log(data);
+          history("/dashboard");
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        });
+    }
+  };
   return (
     <div className={styles.wrapperSignUpPage}>
       <div className={styles.formContainer}>
@@ -27,7 +70,7 @@ const LoginPage = () => {
               type={"text"}
               id="email"
               name={"email"}
-              onchange={(event) => {
+              onChange={(event) => {
                 setFormData({ ...formData, emailOrPhone: event.target.value });
               }}
             />
@@ -41,7 +84,7 @@ const LoginPage = () => {
               type={"password"}
               id="password"
               name={"password"}
-              onchange={(event) => {
+              onChange={(event) => {
                 setFormData({ ...formData, password: event.target.value });
               }}
             />
@@ -56,7 +99,7 @@ const LoginPage = () => {
           </Link>
 
           {/* Submit button */}
-          <FormButton type={"submit"} text={"Log In"} />
+          <FormButton type={"submit"} text={"Log In"} onClick={handleSubmit} />
 
           {/* Navigate to sign up page. */}
           <span className={classNames(styles.registerLink)}>

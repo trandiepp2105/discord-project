@@ -1,10 +1,10 @@
 from rest_framework import serializers
-from .models import UserDiscord, Server, Channel
+from .models import UserDiscord, Server, Channel, Member, Friend, FriendChat
 
 class UserDiscordSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserDiscord
-        fields = ['username', 'email', 'password', 'is_verified']
+        fields = ['username', 'email', 'password', 'is_verified', 'display_name', 'date_of_birth']
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
@@ -34,3 +34,11 @@ class CreateChannelSerializer(serializers.Serializer):
         channel = Channel.objects.create(**validated_data)
         return channel
 
+class MemberSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Member
+        fields = ['user_id', 'server_id', 'role']
+
+    def create(self, validated_data):
+        member = Member.objects.create(**validated_data)
+        return member

@@ -11,6 +11,7 @@ urlpatterns = [
     path('signup/', views.SignUp.as_view(), name='signup'),
     path('login/', views.Login.as_view() , name='login'),
     path('verify/<uidb64>/<token>/', views.Verify.as_view() , name='verify'),
+    path('servers/', views.ServerViewSet.as_view() , name='servers'),
     # path('csrf/', views.csrf.as_view() , name='csrf'),
     path('friend_chat/', include('friend_chat.urls')),
 

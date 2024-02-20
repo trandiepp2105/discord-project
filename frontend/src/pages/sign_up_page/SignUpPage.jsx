@@ -1,5 +1,5 @@
 //Module import
-import { React, useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import classNames from "classnames";
@@ -140,7 +140,7 @@ const SignUpPage = () => {
         email: formData.email,
         password: formData.password,
         display_name: formData.displayName,
-        date_of_birth: `${formData.dayOfBirth.year}-${formData.dayOfBirth.month}-${formData.dayOfBirth.day}`,
+        date_of_birth: `${formData.dayOfBirth.year}-${formData.dayOfBirth.month.padStart(2, '0')}-${formData.dayOfBirth.day.padStart(2, '0')}`,
         // date_of_birth: formData.dayOfBirth,
       };
       console.log(body);
@@ -158,6 +158,7 @@ const SignUpPage = () => {
         });
     }
   };
+  
   return (
     <div className={styles.wrapperSignUpPage}>
       <div className={styles.formContainer}>

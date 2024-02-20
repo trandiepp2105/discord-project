@@ -1,6 +1,6 @@
 from rest_framework import viewsets, generics, status, views
 from .models import UserDiscord
-from .serializers import UserDiscordSerializer, LoginSerializer, CreateServerSerializer, CreateChannelSerializer
+from .serializers import UserDiscordSerializer, LoginSerializer, CreateServerSerializer, CreateChannelSerializer, MemberSerializer
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
@@ -10,13 +10,13 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes
 from django.contrib.auth.tokens import default_token_generator
 from rest_framework.permissions import IsAuthenticated
-from django.middleware.csrf import get_token
+# from django.middleware.csrf import get_token
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny
 from .models import Server
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
-
+from datetime import date
 
 
 class UserDiscordViewSet(viewsets.ModelViewSet):
@@ -36,6 +36,8 @@ class SignUp(APIView):
     permission_classes = [AllowAny]
     def post(self, request):
         serializer = UserDiscordSerializer(data=request.data)
+        # day = request.data['date_of_birth'].split('/')
+        # day_of_birth = date(int(day[2]), int(day[1]), int(day[0]))
         if serializer.is_valid():
             user = serializer.save(is_verified=False)
             uid = urlsafe_base64_encode(force_bytes(user.pk))
@@ -80,9 +82,13 @@ class Login(APIView):
                 refresh = RefreshToken.for_user(user)
                 access_token = str(refresh.access_token)
                 refresh_token = str(refresh)
-                return Response({'access': access_token, 'refresh': refresh_token}, status=status.HTTP_200_OK)
+                response = Response({'message':'Login_success!'}, status=status.HTTP_200_OK)
+                response.set_cookie('jwt_token', access_token, httponly=True, secure=True)
+                response.set_cookie('jwt_refresh', refresh_token, httponly=True, secure=True)
+                return response
+            
             else:
-                return Response({'error': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'error': 'Invalid credentials'}, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -96,14 +102,19 @@ class Logout(APIView):
             return Response({'message': 'You have been logged out'}, status=status.HTTP_200_OK)
         except:
             return Response({'error': 'Can not log out'}, status=status.HTTP_400_BAD_REQUEST)
-
-class CreateGroup(APIView):
-    parser_classes = (IsAuthenticated,)
+        
+class ServerViewSet(APIView):
+    permission_classes = (IsAuthenticated,)
     def post(self, request):
         user = request.user
         serializer = CreateServerSerializer(data=request.data)
         if serializer.is_valid():
             group = serializer.save()
+            create_member = MemberSerializer(data={'user_id': user.id, 'server_id': group.server_id, 'role': 'admin'})
+            if create_member.is_valid():
+                create_member.save()
+            else:
+                return Response(create_member.errors, status=status.HTTP_400_BAD_REQUEST)
             return Response({'message': 'Group created successfully'}, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
