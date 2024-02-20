@@ -19,16 +19,18 @@ class CreateServerSerializer(serializers.Serializer):
     class Meta:
         model = UserDiscord
         fields = ['server_name', 'server_picture']
-    
+
     def create(self, validated_data):
         server = Server.objects.create(**validated_data)
         return server
-    
+
 class CreateChannelSerializer(serializers.Serializer):
+
     class Meta:
         model = Server
         fields = ['channel_name', 'server_id', 'channel_type']
-    
+
     def create(self, validated_data):
         channel = Channel.objects.create(**validated_data)
         return channel
+

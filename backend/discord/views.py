@@ -18,10 +18,12 @@ from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 
 
+
 class UserDiscordViewSet(viewsets.ModelViewSet):
     permission_classes = []
     queryset = UserDiscord.objects.all()
     serializer_class = UserDiscordSerializer
+
 
 # class csrf(APIView):
 #     authentication_classes = []

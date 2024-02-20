@@ -7,3 +7,4 @@ djangorestframework-simplejwt
 Pillow
 pytz
 cryptography
+channels>=3.0.5
