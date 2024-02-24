@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import UserDiscord, Server, Channel, Member, Friend, FriendChat
+from .models import UserDiscord, Server, Channel, Member, FriendChatRoom
 
 class UserDiscordSerializer(serializers.ModelSerializer):
     class Meta:

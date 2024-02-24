@@ -41,24 +41,20 @@ class FriendshipViewSet(viewsets.ModelViewSet):
         else:
             return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    def destroy(self, request, *args, **kwargs):
+            friendship = self.get_object()
+            friendship.delete()
+            return Response({"message": "Friendship deleted successfully"}, status=status.HTTP_200_OK)
 
-    # def perform_create(self, serializer):
-        # from_friend = self.request.user
-        from_friend = UserDiscord.objects.get(username="trandiep")
-        to_friend_username = self.request.data.get('to_friend')
-        if to_friend_username:
-            try:
-                to_friend = UserDiscord.objects.get(username=to_friend_username)
-                if from_friend != to_friend:
-                    serializer.save(from_friend=from_friend, to_friend=to_friend, status=Friendship.PENDING)
-                else:
-                    raise serializers.ValidationError({'message': 'You cannot send a friend request to yourself.'})
-            except UserDiscord.DoesNotExist:
-                raise serializers.ValidationError({'message': 'User not found.'})
+    @action(detail=True, methods=['post'], url_path='accept')
+    def accept_friend_request(self, request, pk=None):
+        friendship = self.get_object()
+        if friendship.status == Friendship.PENDING:
+            friendship.status = Friendship.ACCEPTED
+            friendship.save()
+            return Response({"message": "Friend request accepted successfully"}, status=status.HTTP_200_OK)
         else:
-            raise serializers.ValidationError({'message': 'To friend username is required.'})
-
-
+            return Response({"message": "Friendship request not found or already accepted"}, status=status.HTTP_404_NOT_FOUND)
 
     # @action(detail=True, methods=['post'])
     # def accept_friend_request(self, request, pk=None):
