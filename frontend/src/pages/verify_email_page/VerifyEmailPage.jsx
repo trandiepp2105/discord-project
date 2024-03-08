@@ -8,9 +8,11 @@ const VerifyEmailPage = () => {
   const { uid, token } = useParams();
   const sendToken = () => {
     const url = window.location.href;
-    const endpoint = `http://127.0.0.1:8000/verify/${url.split("/")[4]}/${url.split("/")[5]}/`;
+    const endpoint = `http://127.0.0.1:8000/verify/${url.split("/")[4]}/${
+      url.split("/")[5]
+    }/`;
     function sleep(ms) {
-      return new Promise(resolve => setTimeout(resolve, ms));
+      return new Promise((resolve) => setTimeout(resolve, ms));
     }
     fetch(endpoint, {
       method: "GET",
@@ -27,7 +29,7 @@ const VerifyEmailPage = () => {
         window.localStorage.removeItem("verified");
         history("/login");
       });
-  }
+  };
   React.useEffect(() => {
     sendToken();
   }, []);
@@ -56,7 +58,5 @@ const VerifyEmailPage = () => {
     </div>
   );
 };
-
-
 
 export default VerifyEmailPage;

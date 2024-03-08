@@ -1,0 +1,84 @@
+.channelTextArea {
+  width: 100%;
+  margin-bottom: 24px;
+  position: relative;
+  text-indent: 0;
+  border-radius: 8px;
+  background-color: var(--secondary-bg-color);
+}
+
+.scrollableContainer {
+  overflow-x: hidden;
+  overflow-y: scroll;
+  max-height: 50vh;
+  border-radius: 8px;
+  backface-visibility: hidden;
+  scrollbar-width: none;
+}
+
+.scrollableContainer .inner {
+  display: flex;
+  padding: 10px 0;
+  justify-content: start;
+}
+
+.inner .attachButton {
+  padding: 0 16px;
+  display: flex;
+  align-items: start;
+  background-color: inherit;
+  border: none;
+  outline: none;
+}
+
+.attachButton .attachIcon {
+  width: 24px;
+  height: 24px;
+  filter: var(--inactive-filter-icon);
+}
+
+.attachButton:hover .attachIcon {
+  filter: var(--white-filter-icon);
+}
+
+.buttons {
+  display: flex;
+  align-items: start;
+}
+
+.wrapperButton {
+  width: 24px;
+  height: 24px;
+  background-color: inherit;
+  border: none;
+  outline: none;
+  margin: 0 8px;
+}
+
+.iconButton {
+  width: 100%;
+  height: 100%;
+  filter: var(--inactive-filter-icon);
+}
+
+.wrapperButton:hover .iconButton {
+  filter: var(--white-filter-icon);
+}
+
+.textArea {
+  padding-top: 1px;
+  min-height: 22px !important;
+  flex: 1;
+  border: none;
+  outline: none;
+  background-color: inherit;
+  font-size: 15px;
+  line-height: 1.5;
+  color: #cad0d8;
+  font-weight: 200;
+  overflow: hidden;
+}
+
+.textArea::-webkit-scrollbar {
+  display: none;
+}

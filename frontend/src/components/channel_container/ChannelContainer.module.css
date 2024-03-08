@@ -1,0 +1,41 @@
+.wrapper {
+  width: 100%;
+  height: 42px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  padding: 5px 8px;
+  box-sizing: border-box;
+  color: #959ba4;
+  margin-bottom: 2px;
+}
+
+.wrapper:hover,
+.activeChannel {
+  background-color: var(--active-hover-container);
+  color: white;
+}
+
+.activeChannel .avatarImg {
+  filter: var(--white-filter-icon);
+}
+
+.avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 32px;
+  height: 32px;
+  margin-right: 12px;
+}
+
+.avatarImg {
+  width: 24px;
+  object-fit: cover;
+  filter: var(--inactive-filter-icon);
+}
+
+.wrapper:hover .avatarImg {
+  filter: var(--white-filter-icon);
+}

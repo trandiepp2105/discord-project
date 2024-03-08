@@ -1,0 +1,249 @@
+.sideBar {
+  display: flex;
+  flex-direction: column;
+  width: 240px;
+  min-height: 100vh;
+  background-color: #2b2d31;
+  box-sizing: border-box;
+}
+
+.sideBar .sideBarContent {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  min-height: 0;
+}
+
+.sideBar .serverSideBarContent {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  min-height: 0;
+}
+
+.serverSideBarHeader {
+  width: 100%;
+  box-sizing: border-box;
+  height: 48px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid;
+  border-color: var(--primary-bg-color);
+  padding: 12px 16px;
+  cursor: pointer;
+}
+
+.serverSideBarHeader:hover {
+  background-color: var(--tertiary-bg-color);
+}
+
+.serverSideBarHeader .serverName {
+  color: white;
+  font-size: 13px;
+  line-height: 1.25;
+  font-weight: 600;
+}
+
+.serverSideBarHeader .dropdownMenu {
+  width: 25px;
+  height: 25px;
+}
+
+.dropdownMenu .dropButton {
+  width: 100%;
+  height: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.dropButton .dropIcon {
+  width: 100%;
+  height: 100%;
+  color: white;
+  object-fit: cover;
+}
+
+.sideBar .scoller {
+  flex: 1;
+  overflow: hidden scroll;
+}
+
+.scollerItem {
+  width: 100%;
+}
+
+.serverSideBarContent .scoller {
+  padding: 10px 0;
+  box-sizing: border-box;
+}
+
+.scoller::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.scoller {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.sideBar .sideBarContent .scoller {
+  padding: 8px;
+}
+
+.scoller .channelContainer {
+  padding: 0 8px;
+  margin: 1px 0;
+}
+
+.scoller .divider {
+  width: 95%;
+  height: 0.5px;
+  margin: 10px auto;
+  box-sizing: border-box;
+  background-color: var(--normal-text-color);
+  display: block;
+}
+
+.channelsManagerContainer {
+  display: flex;
+  justify-content: space-between;
+  color: var(--normal-text-color);
+  font-size: 12px;
+  align-items: center;
+  padding-right: 8px;
+  margin-top: 10px;
+}
+
+.channelsManagerContainer .leftColumn {
+  display: flex;
+  align-items: center;
+}
+
+.channelsManagerContainer .wrapperIcon {
+  width: 15px;
+  height: 15px;
+  margin-right: 5px;
+  margin-left: 2px;
+}
+
+.channelsManagerContainer .icon {
+  width: 100%;
+  height: 100%;
+  filter: var(--inactive-filter-icon);
+}
+
+.channelsManagerContainer .addButton {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  outline: none;
+  border: none;
+  background-color: inherit;
+  margin-right: 10px;
+  position: relative;
+}
+
+.addButton .wrapperTextPopup {
+  position: absolute;
+  top: -210%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: none;
+  z-index: 9999;
+}
+
+.addButton .addIcon {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: var(--inactive-filter-icon);
+}
+
+.addButton:hover .addIcon {
+  filter: var(--white-filter-icon);
+}
+
+.addButton:hover .wrapperTextPopup {
+  display: block !important;
+}
+
+.channelsManagerContainer:hover {
+  color: white;
+}
+
+.channelsManagerContainer:hover .icon {
+  filter: var(--white-filter-icon);
+}
+
+.searchBar {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0 10px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  border-bottom: 2px solid;
+  border-color: var(--primary-bg-color);
+}
+
+.searchBar .searchBarComponent {
+  width: 100%;
+  height: 28px;
+  overflow: hidden;
+  border-radius: 4px;
+  background-color: #1e1f22;
+  box-shadow: none;
+  color: #747681 !important;
+  text-align: left;
+  text-overflow: ellipsis;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 24px;
+  white-space: nowrap;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  outline: none;
+  cursor: pointer;
+}
+
+.privateChannelsHeaderContainer {
+  display: flex;
+  padding: 18px 0px 4px 10px;
+  box-sizing: border-box;
+  height: 40px;
+  justify-content: space-between;
+  color: var(--normal-text-color);
+}
+
+.privateChannelsHeaderContainer .headingText {
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.privateChannelsHeaderContainer:hover .headingText {
+  color: white;
+}
+
+.privateChannelsHeaderContainer .headingText:hover {
+  color: white;
+}
+
+.privateChannelsHeaderIcon {
+  font-weight: bold;
+  font-size: 14px;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.privateChannelsHeaderIcon:hover {
+  color: white;
+}

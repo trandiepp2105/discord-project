@@ -1,12 +1,12 @@
 import { React, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+
 import classNames from "classnames";
 import styles from "./LoginPage.module.css";
 import InputField from "../../components/input_field/InputField";
 import FormButton from "../../components/form_button/FormButton";
-
-
-
+import Cookies from "js-cookie";
 const LoginPage = () => {
   const initialFormData = {
     emailOrPhone: "",
@@ -20,33 +20,46 @@ const LoginPage = () => {
     return false;
   };
   const history = useNavigate();
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
+    function sleep(ms) {
+      return new Promise((resolve) => setTimeout(resolve, ms));
+    }
     event.preventDefault();
     console.log(formData);
-    if(checkInputFields(formData)){
+    if (checkInputFields(formData)) {
       const endpoint = "http://127.0.0.1:8000/login/";
       const data = {
         username: formData.emailOrPhone,
         password: formData.password,
       };
       console.log(data);
-      fetch(endpoint, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      })
+
+      axios
+        .post(endpoint, data, {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "application/json",
+            // other headers if needed
+          },
+        })
         .then((response) => {
-          if (!response.ok) {
+          if (response.status !== 200) {
             throw new Error("HTTP error, status = " + response.status);
           }
-          return response.json();
-        
+          return response.data;
         })
         .then((data) => {
-          console.log(data);
-          history("/dashboard");
+          console.log("data:", data);
+          Cookies.set("access_token", data.access_token, {
+            sameSite: "none",
+            secure: true,
+          });
+          Cookies.set("refresh_token", data.refresh_token, {
+            sameSite: "none",
+            secure: true,
+          });
+          sleep(5000);
+          history("/channel/@me");
         })
         .catch((error) => {
           console.error("Error:", error);

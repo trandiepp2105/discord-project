@@ -11,7 +11,7 @@ import WatingForAuthPage from "./pages/waiting_for_auth_page/WaitingForAuthPage"
 import DashboardPage from "./pages/dashboard_page/DashboardPage";
 function App() {
   return (
-    <div>
+    <>
       <Router>
         <Routes>
           <Route path="/" element={<Layout />}>
@@ -27,11 +27,11 @@ function App() {
               path="waiting-for-email-verification"
               element={<WatingForAuthPage />}
             />
-            <Route path="dashboard" element={<DashboardPage />} />
+            <Route path="/channel/:user/*" element={<DashboardPage />} />
           </Route>
         </Routes>
       </Router>
-    </div>
+    </>
   );
 }
 

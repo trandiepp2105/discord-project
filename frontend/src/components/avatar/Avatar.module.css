@@ -1,0 +1,70 @@
+.wrapper {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #6266f6;
+  position: relative;
+  aspect-ratio: 1 / 1;
+}
+
+.avatarImg {
+  width: 56.25%;
+  object-fit: cover;
+  filter: var(--white-filter-icon);
+}
+
+.wrapperStatusMark {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 15px;
+  height: 15px;
+  background-color: var(--secondary-bg-color);
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.statusMark {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 3px solid #81848e;
+  background-color: var(--secondary-bg-color);
+  box-sizing: border-box;
+}
+
+.onlineStatusMark {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  box-sizing: border-box;
+  background-color: green;
+}
+
+.closeMark {
+  position: absolute;
+  top: 35%;
+  right: 8px;
+  cursor: pointer;
+  display: none;
+  color: var(--normal-text-color);
+}
+
+.closeMark:hover {
+  color: white;
+}
+
+.wrapper:hover .closeMark {
+  display: block;
+}

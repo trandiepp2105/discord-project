@@ -1,9 +1,58 @@
 @import url("https://fonts.googleapis.com/css2?family=Varela+Round&display=swap");
 
+html {
+  height: 100%;
+  overflow: hidden;
+}
+
+body,
+#root {
+  height: 100%;
+}
+
 :root {
+  --main-color: #6265f6;
   --primary-font: "Varela Round", sans-serif;
   --danger-text-color: red;
+  --primary-bg-color: #1e1f22;
+  --secondary-bg-color: #2b2d31;
+  --tertiary-bg-color: #313338;
+  /* --server-bar-bg-color: #1e1f22;
+  primary-bg-color: #1e1f22; */
+  --icon-bg-color: #42a554;
+  --normal-text-color: #959ba4;
+  --active-hover-container: #404249;
+  --white-filter-icon: invert(100%) sepia(0%) saturate(7433%) hue-rotate(351deg)
+    brightness(119%) contrast(101%);
+  --inactive-filter-icon: invert(68%) sepia(11%) saturate(250%)
+    hue-rotate(177deg) brightness(90%) contrast(79%);
+  --divider-color: #404249;
+  --inactive-add-friend-btn: #40428c;
+  --active-add-friend-btn: #6265f6;
+  --side-bar-header-hover: #81848e;
+  --text-link: #469dee;
+  --focus-input: #48a8ff;
+  --success-request: #42a554;
+  --failure-request: #e54041;
 }
+/*
+::-webkit-scrollbar {
+  background-color: var(--secondary-bg-color);
+}
+
+::-moz-scrollbar {
+  background-color: var(--secondary-bg-color);
+}
+::-ms-scrollbar {
+  background-color: var(--secondary-bg-color);
+}
+
+::-webkit-scrollbar-button {
+  color: var(--primary-bg-color);
+}
+::-moz-range-thumb {
+  color: var(--primary-bg-color);
+} */
 
 * {
   font-family: var(--primary-font);

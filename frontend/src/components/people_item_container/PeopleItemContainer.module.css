@@ -1,0 +1,48 @@
+.wrapper {
+  width: 100%;
+  height: 62px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 11px 0;
+  box-sizing: border-box;
+  border-top: 0.5px solid var(--divider-color);
+
+  cursor: pointer;
+}
+
+.wrapperAvatar {
+  margin-right: 12px;
+}
+
+.userInfor {
+  display: flex;
+  overflow: hidden;
+  min-width: 250px;
+}
+
+.userInfor .text {
+  color: white;
+}
+
+.text .userName {
+  font-weight: bold;
+}
+
+.text .status {
+  font-size: 0.8rem;
+  color: var(--normal-text-color);
+}
+
+.actionsContainer {
+  display: flex;
+}
+
+.wrapperAction {
+  margin-left: 10px;
+}
+
+.actionAvatar {
+  background-color: #2b2d31;
+  cursor: pointer;
+}

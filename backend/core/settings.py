@@ -45,7 +45,7 @@ INSTALLED_APPS = [
 
 
     'discord',
-    'friend_chat',
+    # 'friend_chat',
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
 ]
@@ -166,7 +166,7 @@ SECRET_KEY = 'django-insecure-3a-&w9gbfij_8pqd@dinubxk52f#$u4nf!m_6hr-0&ewz@td(y
 from datetime import timedelta
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=300),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': True,
@@ -184,20 +184,30 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'hokhanhduy2@gmail.com'
-EMAIL_HOST_PASSWORD = 'mnovxyssiylzfibk'
+# EMAIL_HOST_USER = 'hokhanhduy2@gmail.com'
+# EMAIL_HOST_PASSWORD = 'mnovxyssiylzfibk'
+EMAIL_HOST_USER = 'discord.send.noreply@gmail.com'
+EMAIL_HOST_PASSWORD = 'qxfo wajb khgm gzry'
 
 
 # cors header
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
+    "http://127.0.0.1:3000"
 ]
 
 # cors header
-CORS_ORIGIN_ALLOW_ALL = True
 
+CORS_ORIGIN_WHITELIST = [
+    'http://localhost:3000',
+]
 # auth backends
 AUTHENTICATION_BACKENDS = [
     'discord.auth.EmailOrUsernameModelBackend',
     # 'django.contrib.auth.backends.ModelBackend',
 ]
+
+
+SESSION_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_SAMESITE = 'Lax'
+CORS_ALLOW_CREDENTIALS = True

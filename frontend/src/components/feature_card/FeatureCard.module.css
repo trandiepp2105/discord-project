@@ -1,0 +1,52 @@
+.wrapper {
+  width: 100%;
+  display: flex;
+  outline: none;
+  border: none;
+  padding: 16px;
+  background-color: var(--primary-bg-color);
+  border-radius: 10px;
+  align-items: center;
+  cursor: pointer;
+}
+
+.wrapper:hover {
+  background-color: var(--active-hover-container);
+}
+
+.iconWrapper {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+.iconWrapper .icon {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.text {
+  height: 100%;
+  margin: 0 16px;
+  flex: 1;
+  color: white;
+  text-align: start;
+}
+
+.wrapperClickIcon {
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+}
+
+.clickIcon {
+  width: 100%;
+  height: 100%;
+  rotate: -90deg;
+  filter: var(--inactive-filter-icon);
+}
+
+.wrapperClickIcon:hover .clickIcon {
+  filter: var(--white-filter-icon);
+}

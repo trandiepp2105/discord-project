@@ -42,6 +42,38 @@ class UserDiscord(AbstractUser):
     class Meta:
         db_table = 'user'
 
+class Friendship(models.Model):
+    PENDING = 'pending'
+    ACCEPTED = 'accepted'
+    BLOCKED = 'blocked'
+    STATUS = [
+        (PENDING, 'Pending'),
+        (ACCEPTED, 'Accepted'),
+        (BLOCKED, 'Blocked')
+    ]
+    from_friend = models.ForeignKey(
+        UserDiscord,
+        on_delete=models.CASCADE,
+        related_name="friendships_as_from_friend",
+    )
+    to_friend = models.ForeignKey(
+        UserDiscord,
+        on_delete=models.CASCADE,
+        related_name="friendships_as_to_friend",
+    )
+
+    blocker = models.ForeignKey(UserDiscord, on_delete=models.CASCADE,
+        related_name="blocker", null = True, blank = True, default=None)
+
+    date_added = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=10, choices=STATUS, default=PENDING)
+
+    def __str__(self):
+        return f"{self.from_friend.username} is friends with {self.to_friend.username}"
+
+    class Meta:
+        unique_together = ("from_friend", "to_friend")
+        db_table = 'friendship'
 
 class Server(models.Model):
     server_id = models.AutoField(primary_key=True)
@@ -66,7 +98,6 @@ class Member(models.Model):
         (MODERATOR, 'Moderator'),
         (MEMBER, 'Member')
     ]
-    member_id = models.AutoField(primary_key=True)
     user = models.ForeignKey(UserDiscord, on_delete=models.CASCADE)
     server = models.ForeignKey(Server, on_delete=models.CASCADE)
     date_joined = models.DateTimeField(auto_now_add=True)
@@ -78,6 +109,14 @@ class Member(models.Model):
     class Meta:
         db_table = 'member'
 
+class ChannelCategory(models.Model):
+    name = models.CharField(max_length=100)
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        db_table = 'channel_category'
+
 class Channel(models.Model):
     TEXT = 'text'
     VOICE = 'voice'
@@ -85,36 +124,18 @@ class Channel(models.Model):
         (TEXT, 'Text'),
         (VOICE, 'Voice')
     ]
-    channel_id = models.AutoField(primary_key=True)
     channel_name = models.CharField(max_length=100)
     server = models.ForeignKey(Server, on_delete=models.CASCADE)
+    members = models.ForeignKey(Member, on_delete=models.CASCADE)
     date_created = models.DateTimeField(auto_now_add=True)
     channel_type = models.CharField(max_length=5, choices=CHOOSES, default=TEXT)
-
+    last_message = models.ForeignKey("Message", on_delete=models.CASCADE, related_name='last_message')
+    channel_category = models.ForeignKey("ChannelCategory", on_delete=models.CASCADE, related_name='channel_category')
     def __str__(self):
         return self.channel_name
 
     class Meta:
         db_table = 'channel'
-
-# class Friend(models.Model):
-#     PENDING = 'pending'
-#     ACCEPTED = 'accepted'
-#     STATUS = [
-#         (PENDING, 'Pending'),
-#         (ACCEPTED, 'Accepted')
-#     ]
-#     friend_id = models.AutoField(primary_key=True)
-#     user1_id = models.ForeignKey(UserDiscord, on_delete=models.CASCADE, related_name='user1_id')
-#     user2_id = models.ForeignKey(UserDiscord, on_delete=models.CASCADE, related_name='user2_id')
-#     date_added = models.DateTimeField(auto_now_add=True)
-#     status = models.CharField(max_length=10, choices=STATUS, default=PENDING)
-
-#     def __str__(self):
-#         return self.user_id.username
-
-#     class Meta:
-#         db_table = 'friend'
 
 
 class FriendChatRoom(models.Model):

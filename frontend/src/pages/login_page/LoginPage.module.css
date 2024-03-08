@@ -5,6 +5,10 @@
   min-height: 100vh;
   display: flex;
   align-items: center;
+  overflow-y: scroll;
+  box-sizing: border-box;
+  height: 100%;
+  padding: 10px;
 }
 
 .formContainer {

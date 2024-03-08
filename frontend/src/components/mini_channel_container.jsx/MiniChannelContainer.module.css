@@ -1,0 +1,85 @@
+.wrapper {
+  cursor: pointer;
+  position: relative;
+  box-sizing: border-box;
+  padding: 6px 8px;
+  border-radius: 4px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.wrapper .leftColumn {
+  display: flex;
+}
+
+.leftColumn .name {
+  padding-top: 2px;
+}
+
+.wrapper:hover,
+.activeWrapper {
+  background-color: var(--active-hover-container);
+}
+
+.content {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  color: var(--normal-text-color);
+  justify-content: space-between;
+}
+
+.wrapperIcon {
+  width: 20px;
+  height: 20px;
+  margin-right: 7px;
+}
+
+.icon {
+  width: 100%;
+  height: 100%;
+  filter: var(--inactive-filter-icon);
+}
+
+.wrapper:hover .icon {
+  filter: var(--white-filter-icon);
+}
+
+.wrapper:hover .name {
+  color: white;
+}
+
+.featColumn {
+  display: flex;
+}
+
+.wrapperFeatIcon {
+  width: 16px;
+  height: 16px;
+  margin-left: 10px;
+  position: relative;
+}
+
+.featIcon {
+  width: 16px;
+  height: 16px;
+  object-fit: cover;
+  filter: var(--inactive-filter-icon);
+}
+
+.wrapperFeatIcon:hover .featIcon {
+  filter: var(--white-filter-icon);
+}
+
+.wrapperTextPopup {
+  position: absolute;
+  top: -250%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: none;
+  z-index: 9999;
+}
+
+.wrapperFeatIcon:hover .wrapperTextPopup {
+  display: block;
+}

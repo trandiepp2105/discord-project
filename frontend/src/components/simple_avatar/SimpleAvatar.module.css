@@ -1,0 +1,14 @@
+.wrapperAvatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #6266f6;
+}
+
+.avatarImg {
+  width: 56.25%;
+  object-fit: cover;
+}

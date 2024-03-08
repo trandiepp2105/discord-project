@@ -1,0 +1,19 @@
+.wapperPage {
+  display: flex;
+  flex-direction: row;
+  overflow: unset;
+  height: 100%;
+  overflow: unset;
+}
+
+.base {
+  display: flex;
+  flex: 1;
+  flex-direction: row;
+}
+
+.mainPlace {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}

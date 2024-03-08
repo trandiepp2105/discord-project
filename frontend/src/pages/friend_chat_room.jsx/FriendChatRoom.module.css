@@ -1,0 +1,166 @@
+.wrapper {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--tertiary-bg-color);
+  box-sizing: border-box;
+}
+
+.mainContent {
+  flex: 1;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+
+.messageWrapper {
+  flex: 1;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.sendMessageForm {
+  padding-left: 16px;
+  padding-right: 16px;
+  padding-top: 15px;
+  box-sizing: border-box;
+}
+
+.scroller {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
+.scrollerContent {
+  display: flex;
+  flex-direction: column;
+}
+
+.scrollerInner {
+  list-style-type: none;
+}
+
+.generalInfor {
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 auto;
+  justify-content: flex-end;
+  margin: 16px;
+  color: white;
+}
+
+.wrapperAvatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #6266f6;
+}
+
+.avatarImg {
+  width: 45px;
+  object-fit: cover;
+}
+
+.generalInfor .heading {
+  font-weight: 700;
+  margin: 8px 0;
+  font-size: 32px;
+  line-height: 1.25;
+}
+
+.generalInfor .description {
+}
+
+.generalInfor .mediumHeading {
+  font-size: 24px;
+  line-height: 1.25;
+  font-weight: 500;
+  margin-bottom: 20px;
+}
+
+.generalInfor .descriptionText {
+  font-size: 14px;
+  color: var(--normal-text-color);
+}
+
+.generalInfor .featureTab {
+  margin-top: 16px;
+  display: flex;
+  align-items: center;
+}
+
+.generalInfor .textBtn {
+  border: none;
+  outline: none;
+  background-color: inherit;
+  cursor: pointer;
+  color: var(--normal-text-color);
+}
+
+.generalInfor .textBtn:hover {
+  filter: brightness(120%);
+}
+
+.generalInfor .divider {
+  width: 4px;
+  height: 4px;
+  margin: 0 16px;
+  border-radius: 50%;
+  background-color: var(--normal-text-color);
+}
+
+.generalInfor .featureBtn {
+  padding: 5px 16px;
+  margin-right: 8px;
+  border-radius: 3px;
+  color: white;
+  background-color: var(--active-hover-container);
+  border: none;
+  outline: none;
+  cursor: pointer;
+}
+
+.generalInfor .featureBtn:hover {
+  filter: brightness(120%);
+}
+
+.dateDivider {
+  margin-top: 1.5rem;
+  /* margin-bottom: 1rem; */
+  margin-left: 1rem;
+  margin-right: 0.875rem;
+  position: relative;
+  left: auto;
+  right: auto;
+  z-index: 1;
+  height: 0;
+  border-top: thin solid var(--normal-text-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  flex: 0 0 auto;
+  pointer-events: none;
+  box-sizing: border-box;
+}
+
+.dateDividerContent {
+  display: block;
+  flex: 0 0 auto;
+  padding: 2px 4px;
+  color: var(--normal-text-color);
+  background: var(--tertiary-bg-color);
+  line-height: 13px;
+  font-size: 12px;
+  margin-top: -1px;
+  font-weight: 600;
+  border-radius: 8px;
+}

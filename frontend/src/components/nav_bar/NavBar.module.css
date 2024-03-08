@@ -1,0 +1,118 @@
+.navBar {
+  width: 100%;
+  box-sizing: border-box;
+  background-color: var(--tertiary-bg-color);
+  padding: 8px;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  border-bottom: 2px solid;
+  border-color: var(--primary-bg-color);
+}
+
+.children {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.children .iconWrapper {
+  cursor: auto;
+}
+
+.children .titleWrapper {
+  margin-right: 8px;
+}
+
+.titleWrapper .title {
+  font-size: 16px;
+  line-height: 1.25;
+  font-weight: 400;
+  color: white;
+}
+
+.children .tabBar {
+  display: flex;
+  align-items: center;
+}
+
+.tabBar .item {
+  min-width: 40px;
+  display: flex;
+  align-items: center;
+  padding: 4px 8px;
+  margin: 0 8px;
+  color: var(--normal-text-color);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.tabBar .item:hover,
+.tabBar .activeItem {
+  background-color: var(--active-hover-container);
+  color: white;
+}
+
+.tabBar .addFriendButton,
+.tabBar .activeAddFriendButton {
+  background-color: #42a554;
+  border: none;
+  outline: none;
+  color: white;
+}
+
+.tabBar .activeAddFriendButton {
+  background-color: inherit;
+  color: #42a554;
+}
+
+.tabBar .activeAddFriendButton:hover {
+  background-color: inherit;
+  color: #42a554;
+  cursor: default;
+}
+
+.addFriendButton:hover {
+  background-color: #42a554 !important;
+}
+
+.toolBar {
+  width: fit-content;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.newDMTool {
+  display: flex;
+  align-items: center;
+  /* display: block; */
+}
+
+.iconWrapper {
+  width: 24px;
+  height: 24px;
+  margin: 0 8px;
+  cursor: pointer;
+}
+
+.toolBar .iconWrapper:hover .toolIcon {
+  filter: var(--white-filter-icon);
+}
+
+.toolIcon {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: var(--inactive-filter-icon);
+}
+
+.divider {
+  width: 1px;
+  height: 24px;
+  margin: 0 8px;
+  flex: 0 0 auto;
+  background: var(--normal-text-color);
+  /* filter: var(--inactive-filter-icon); */
+}

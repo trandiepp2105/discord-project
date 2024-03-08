@@ -1,0 +1,93 @@
+.wrapper {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--tertiary-bg-color);
+}
+
+.wrapperNavBar {
+  height: fit-content;
+}
+
+.mainContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+.messageWrapper {
+  flex: 1;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.sendMessageForm {
+  padding-left: 16px;
+  padding-right: 16px;
+  padding-top: 15px;
+  box-sizing: border-box;
+}
+
+.scroller {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
+.scrollerContent {
+  display: flex;
+  flex-direction: column;
+}
+
+.scrollerInner {
+  list-style-type: none;
+}
+
+.generalInfor {
+  margin: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.generalInforInner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 400px;
+  margin: 16px;
+}
+
+.generalInfor .heading {
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.25;
+  font-size: 32px;
+}
+
+.generalInfor .description {
+  text-align: center;
+  margin: 8px 0 12px 0;
+  color: var(--normal-text-color);
+  font-size: 13px;
+  line-height: 1.2857142857142858;
+  font-weight: 400;
+}
+
+.generalInfor .description .textLink {
+  color: var(--text-link);
+  text-decoration: none;
+  font-weight: 100;
+}
+
+.generalInfor .cardWrapper {
+  width: 100%;
+  margin-top: 8px;
+}

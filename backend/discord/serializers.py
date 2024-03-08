@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import UserDiscord, Server, Channel, Member, FriendChatRoom
+from .models import UserDiscord, Server, Channel, Member, FriendChatRoom, Friendship
 
 class UserDiscordSerializer(serializers.ModelSerializer):
     class Meta:
@@ -11,11 +11,19 @@ class UserDiscordSerializer(serializers.ModelSerializer):
         user = UserDiscord.objects.create_user(**validated_data)
         return user
 
+class FriendshipSerializer(serializers.ModelSerializer):
+    from_friend = UserDiscordSerializer(read_only=True)
+    to_friend = UserDiscordSerializer(read_only=True)
+
+    class Meta:
+        model = Friendship
+        fields = ('id', 'from_friend', 'to_friend', 'status', 'date_added')
+
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField()
     password = serializers.CharField()
 
-class CreateServerSerializer(serializers.Serializer):
+class ServerSerializer(serializers.Serializer):
     class Meta:
         model = UserDiscord
         fields = ['server_name', 'server_picture']

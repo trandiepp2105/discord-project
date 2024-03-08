@@ -1,0 +1,94 @@
+.wrapper {
+  width: 72px;
+  padding-top: 12px;
+  background-color: var(--primary-bg-color);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  flex-shrink: 0;
+  min-height: 100vh;
+  align-items: center;
+  min-height: 100vh;
+  box-sizing: border-box;
+  overflow: hidden scroll;
+}
+
+.wrapper::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.wrapper {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+.wrapperListItem {
+  width: 100%;
+  display: flex;
+  position: relative;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.wrapperListItem .activeMark {
+  position: absolute;
+  top: 4px;
+  left: -4px;
+  display: block;
+  width: 8px;
+  height: 40px;
+  border-radius: 0 4px 4px 0;
+  background-color: white;
+}
+
+.listItem {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #313338;
+  border-radius: 50%;
+  background-color: #313338;
+  color: white;
+  font-weight: bold;
+  font-size: 0.8rem;
+  transition: background-color 0.3s ease-out, color 0.3s ease-out;
+}
+
+.activeListItem,
+.listItem:hover {
+  border-radius: 17px !important;
+  background-color: #6265f6 !important;
+}
+
+.itemImg {
+  width: 28px;
+  object-fit: cover;
+}
+
+.separator {
+  height: 2px;
+  width: 32px;
+  border-radius: 1px;
+  background-color: #36363c;
+  margin-bottom: 8px;
+}
+
+.specialListItem:hover {
+  background-color: #42a554 !important;
+}
+
+.specialListItem .cusIcon {
+  color: #42a554;
+  font-size: 1.7rem;
+}
+
+.specialListItem:hover .cusIcon {
+  color: white;
+}
+
+.specialListItem .compassIcon {
+  font-size: 1.3rem;
+}
