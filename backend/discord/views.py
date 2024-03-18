@@ -1,6 +1,6 @@
-from rest_framework import viewsets, generics, status, views, serializers
-from .models import UserDiscord
-from .serializers import UserDiscordSerializer, LoginSerializer, ServerSerializer, CreateChannelSerializer, MemberSerializer
+from rest_framework import viewsets, generics, status, views, serializers, pagination
+from .models import UserDiscord, FriendChatRoom
+from .serializers import *
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
@@ -24,10 +24,14 @@ from rest_framework.decorators import action
 from .serializers import FriendshipSerializer
 from .models import UserDiscord, Friendship
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+from django.forms.models import model_to_dict
 class UserDiscordViewSet(viewsets.ModelViewSet):
     permission_classes = []
     queryset = UserDiscord.objects.all()
     serializer_class = UserDiscordSerializer
+
 
 class FriendshipViewSet(viewsets.ModelViewSet):
     authentication_classes = [JWTAuthentication]
@@ -43,7 +47,11 @@ class FriendshipViewSet(viewsets.ModelViewSet):
         print("data: ", data)
         # Get the to_friend username from the request data
         to_friend_username = request.data.get('username')
-        to_friend =  UserDiscord.objects.get(username=to_friend_username)
+
+        if not UserDiscord.objects.filter(username=to_friend_username).exists():
+            return Response({"message": "Tên tài khoản không tồn tại!"}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            to_friend =  UserDiscord.objects.get(username=to_friend_username)
         # Create a new instance of the serializer
         serializer = self.serializer_class(data=request.data, # or request.data
                                            context={'author': from_friend})
@@ -51,20 +59,19 @@ class FriendshipViewSet(viewsets.ModelViewSet):
         # Perform validation on the serializer
         if serializer.is_valid():
             if to_friend_username:
-                to_friend = UserDiscord.objects.get(username=to_friend_username)
                 if Friendship.objects.filter(from_friend=from_friend, to_friend=to_friend).exists() or Friendship.objects.filter(from_friend=to_friend, to_friend=from_friend).exists():
-                    return Response({'message': 'Friendship request already exists.'}, status=status.HTTP_400_BAD_REQUEST)
+                    return Response({'message': 'Hừm, người dùng này đã tồn tại trong danh sách bạn bè!'}, status=status.HTTP_400_BAD_REQUEST)
                 elif from_friend != to_friend:
                     serializer.save(from_friend=from_friend, to_friend=to_friend, status=Friendship.PENDING)
                 else:
-                    return Response({'message': 'You cannot send a friend request to yourself.'}, status=status.HTTP_400_BAD_REQUEST)
+                    return Response({'message': 'Hừm, bạn không thể gửi lời mời kết bạn cho chính mình!'}, status=status.HTTP_400_BAD_REQUEST)
 
             else:
                 return Response({'message': 'To friend username is required.'}, status=status.HTTP_400_BAD_REQUEST)
             message = f'Sending friend request to {to_friend_username} successfully.'
             return Response({'message': message}, status=status.HTTP_201_CREATED)
         else:
-            return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"message": "Error"},data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def destroy(self, request, *args, **kwargs):
             friendship = self.get_object()
@@ -72,11 +79,18 @@ class FriendshipViewSet(viewsets.ModelViewSet):
             return Response({"message": "Friendship deleted successfully"}, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['post'], url_path='accept')
-    def accept_friend_request(self, request, pk=None):
-        friendship = self.get_object()
+    def accept_friend_request(self, request, user_id):
+        # print("pk: ", pk)
+        from_friend = UserDiscord.objects.get(pk=user_id)
+        to_friend = request.user
+        friendship = Friendship.objects.get(from_friend=from_friend, to_friend = to_friend)
         if friendship.status == Friendship.PENDING:
             friendship.status = Friendship.ACCEPTED
             friendship.save()
+
+            if not ( FriendChatRoom.objects.filter(user1=from_friend, user2=to_friend).exists() or FriendChatRoom.objects.filter(user1=to_friend, user2=from_friend).exists()):
+                friend_chat_room = FriendChatRoom.objects.create(user1=from_friend, user2=to_friend)
+
             return Response({"message": "Friend request accepted successfully"}, status=status.HTTP_200_OK)
         else:
             return Response({"message": "Friendship request not found or already accepted"}, status=status.HTTP_404_NOT_FOUND)
@@ -113,14 +127,14 @@ class FriendshipViewSet(viewsets.ModelViewSet):
     def list_pending_friends(self, request, *args, **kwargs):
         # user = UserDiscord.objects.get(username="user1")
         user = request.user
-        friend_requests = Friendship.objects.filter(to_friend=user, status=Friendship.PENDING)
-        user = request.user
+        # friend_requests = Friendship.objects.filter(to_friend=user, status=Friendship.PENDING)
+        # user = request.user
         # friend_requests = Friendship.objects.filter(to_friend=user, status=Friendship.ACCEPTED)
         # friendships = Friendship.objects.filter(Q(from_friend=user, status=Friendship.ACCEPTED) | Q(to_friend=user, status=Friendship.ACCEPTED))
         friendships = Friendship.objects.filter(to_friend=user, status=Friendship.PENDING)
         users = []
         for friendship in friendships:
-            users.append(friendship.to_friend)
+            users.append(friendship.from_friend)
         serializer = UserDiscordSerializer(users, many=True)
         return Response(serializer.data)
 
@@ -167,8 +181,6 @@ class SignUp(APIView):
     permission_classes = [AllowAny]
     def post(self, request):
         serializer = UserDiscordSerializer(data=request.data)
-        # day = request.data['date_of_birth'].split('/')
-        # day_of_birth = date(int(day[2]), int(day[1]), int(day[0]))
         if serializer.is_valid():
             user = serializer.save(is_verified=False)
             uid = urlsafe_base64_encode(force_bytes(user.pk))
@@ -202,13 +214,16 @@ class Login(APIView):
     authentication_classes = []
     permission_classes = [AllowAny]
     def post(self, request):
-        if request.user.is_authenticated:
-            return Response({'error': 'You are already logged in'}, status=status.HTTP_400_BAD_REQUEST)
+        # if request.user.is_authenticated:
+        #     return Response({'error': 'You are already logged in'}, status=status.HTTP_400_BAD_REQUEST)
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
             username = serializer.data['username']
             password = serializer.data['password']
-            user = authenticate(request, username=username, password=password)
+            email = serializer.data['email']
+            user = authenticate(username=username, password=password, email=email)
+            print("user: ", user)
+            # user = authenticate(request, username=username, password=password)
             if user is not None:
                 refresh = RefreshToken.for_user(user)
                 access_token = str(refresh.access_token)
@@ -218,11 +233,10 @@ class Login(APIView):
                 # response.set_cookie(key='jwt_token', value=access_token, httponly=True,  samesite='Lax',  domain='127.0.0.1', max_age=3600, path='/')
                 # response.set_cookie('jwt_refresh', refresh_token, httponly=True, samesite='None',  domain='127.0.0.1', max_age=3600, path='/')
                 return response
-
-            else:
-                return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
         else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+        # else:
+        #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class VerifyLogin(APIView):
     authentication_classes = [JWTAuthentication]
@@ -247,26 +261,31 @@ class Logout(APIView):
 
 class ServerViewSet(APIView):
     permission_classes = (IsAuthenticated,)
-    def post(self, request):
+    authentication_classes = [JWTAuthentication]
+
+    queryset = Server.objects.all()
+    serializer_class = ServerSerializer
+    def create(self, request, *args, **kwargs):
         user = request.user
         serializer = ServerSerializer(data=request.data)
         if serializer.is_valid():
-            group = serializer.save()
-            create_member = MemberSerializer(data={'user_id': user.id, 'server_id': group.server_id, 'role': 'admin'})
+            server = serializer.save()
+            create_member = MemberSerializer(data={'user': user.id, 'server': server.id, 'role': 'admin'})
             if create_member.is_valid():
                 create_member.save()
             else:
                 return Response(create_member.errors, status=status.HTTP_400_BAD_REQUEST)
-            return Response({'message': 'Group created successfully'}, status=status.HTTP_201_CREATED)
+            return Response({'message': 'Server created successfully'}, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class CreateChannel(APIView):
+
     parser_classes = (IsAuthenticated,)
     def post(self, request):
         user = request.user
         server = Server.objects.get(server_id=request.data['server_id'])
-        if user != server.owner_id:
+        if user != server.owner:
             return Response({'error': 'You are not the owner of this group'}, status=status.HTTP_400_BAD_REQUEST)
         serializer = CreateChannelSerializer(data=request.data)
         if serializer.is_valid():
@@ -274,3 +293,77 @@ class CreateChannel(APIView):
             return Response({'message': 'Channel created successfully'}, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class FriendChatRoomViewSet(viewsets.ModelViewSet):
+    authentication_classes = [JWTAuthentication]
+
+    queryset = FriendChatRoom.objects.all()
+    serializer_class = FriendshipSerializer
+
+    def retrieve(self, request, *args, **kwargs):
+        user = request.user
+        friend_id = kwargs.get('friend_id')
+        friend = get_object_or_404(UserDiscord, id=friend_id)
+        # Tìm kiếm một phòng chat với user1_id là user gửi request và user2_id là user thứ hai
+        # hoặc user2_id là user gửi request và user1_id là user thứ hai
+        chat_room = FriendChatRoom.objects.filter(
+        Q(user1=user, user2=friend) |
+        Q(user1=friend, user2=user)).first()
+        print("type: ",type(chat_room))
+        print("helooooo")
+        if chat_room:
+            serializer = self.get_serializer(chat_room)
+            return Response(serializer.data)
+        else:
+            return Response({'error': 'Room not found'}, status=status.HTTP_404_NOT_FOUND)
+
+class MessagePagination(pagination.PageNumberPagination):
+    page_size = 50  # Set the number of items per page
+    page_size_query_param = 'page_size'
+    max_page_size = 1000  # Set the maximum page size
+
+class MessageViewSet(viewsets.ModelViewSet):
+    queryset = Message.objects.all()
+    serializer_class = MessageSerializer
+    pagination_class = MessagePagination
+    authentication_classes = [JWTAuthentication]
+
+    def create(self, request, *args, **kwargs):
+        room_id = request.query_params.get("room_id")
+        room_id = room_id.strip('/')
+        room_id = int(room_id)
+        user =  request.user
+        message = request.data.get("message")
+        serializer = self.serializer_class(data={
+        'message': message,
+        'author': user.id,
+        'room': room_id,
+    })
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'message': 'create message successfully!',  "data":serializer.data}, status=status.HTTP_201_CREATED)
+
+        else:
+            return Response({'message': 'Can not create new message!', 'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+    def get_queryset(self):
+        room_id = self.request.query_params.get('room_id')
+        if room_id is not None:
+            return Message.objects.filter(room=room_id).order_by('-created_at')
+        return self.queryset
+    # def get_queryset(self):
+    #     room_id = self.request.query_params.get('room_id')
+    #     if room_id is not None:
+    #         queryset = Message.objects.filter(room=room_id).order_by('-created_at')
+    #         page = self.paginate_queryset(queryset)
+    #         if page is not None:
+    #             serializer = self.get_serializer(page, many=True)
+    #             return self.get_paginated_response(serializer.data)
+    #         return queryset
+    #     return self.queryset
+    def destroy(self, request, pk=None, *args, **kwargs):
+
+        instance = self.get_object()
+        id =  instance.id
+        super(MessageViewSet, self).destroy(request, pk, *args, **kwargs)
+        return Response({"message": "delete successfully", "id": id}, status=status.HTTP_200_OK)

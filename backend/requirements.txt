@@ -8,3 +8,5 @@ Pillow
 pytz
 cryptography
 channels>=3.0.5
+daphne
+channels_redis

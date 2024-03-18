@@ -1,4 +1,4 @@
-import { React, useEffect, useState } from "react";
+import { React, useEffect, useState, useContext } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import styles from "./SideBar.module.css";
 import { BsFillMicMuteFill } from "react-icons/bs";
@@ -12,7 +12,11 @@ import Avatar from "../avatar/Avatar";
 import Panel from "../panel/Panel";
 import MiniChannelContainer from "../mini_channel_container.jsx/MiniChannelContainer";
 import TextPopup from "../popups/text_popup/TextPopup";
+import Cookies from "js-cookie";
+import axios from "axios";
 const SideBar = ({ serverName, ownChannel = true }) => {
+  const [chatRoom, setChatRoom] = useState(null);
+  const [listFriends, setListFriends] = useState([]);
   const listChannel = ["Bạn bè", "Nitro", "Cửa hàng"];
   const [currentChannel, setcurrentChannel] = useState(listChannel[0]);
   const [currentListItemIndex, setCurrentListItemIndex] = useState(1);
@@ -57,6 +61,59 @@ const SideBar = ({ serverName, ownChannel = true }) => {
     }
   }, [location]);
 
+  const getListFriend = (tab) => {
+    const endpoint = "http://127.0.0.1:8000/friendships/all/";
+    const accessToken = Cookies.get("access_token");
+    axios
+      .get(endpoint, {
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+      .then((response) => {
+        console.log("data: ", response.data);
+        setListFriends(response.data);
+      })
+      .catch((error) => {
+        console.error("Send add friend request error: ", error);
+      });
+  };
+
+  useEffect(() => {
+    getListFriend();
+  }, []);
+
+  const GetFriendChatRoom = (friend_id) => {
+    // get the chat room id from the server and then redirect to that chatroom page
+    const endpoint = `http://localhost:8000/friend-chat-room/?friend_id=${friend_id}/`;
+    const accessToken = Cookies.get("access_token");
+    axios
+      .get(endpoint, {
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+      .then((res) => {
+        setChatRoom(res.data[0]);
+        console.log("room: ", res.data[0]);
+      })
+      .catch((error) => {
+        console.log("room err: ", error);
+      });
+  };
+
+  const handleClick = (friend_id, index) => {
+    GetFriendChatRoom(friend_id);
+    setCurrentListItemIndex(index + 5);
+  };
+
+  useEffect(() => {
+    if (chatRoom) {
+      history(`/channel/@me/${chatRoom.id}`);
+    }
+  }, [chatRoom]);
   return (
     <div className={styles.sideBar}>
       {ownChannel === false && (
@@ -201,7 +258,7 @@ const SideBar = ({ serverName, ownChannel = true }) => {
                 </div>
               </li>
 
-              <li className={styles.scollerItem} aria-posinset={5}>
+              {/* <li className={styles.scollerItem} aria-posinset={5}>
                 <DirectMessageContainer
                   userName="ChamAnh"
                   active={currentListItemIndex == 5 ? true : false}
@@ -228,7 +285,22 @@ const SideBar = ({ serverName, ownChannel = true }) => {
                     setCurrentListItemIndex(7);
                   }}
                 />
-              </li>
+              </li> */}
+              {listFriends.map((friend, index) => {
+                return (
+                  <li className={styles.scollerItem} aria-posinset={index + 5}>
+                    <DirectMessageContainer
+                      userName={friend.username}
+                      active={currentListItemIndex == index + 5 ? true : false}
+                      onClick={() =>
+                        // setCurrentListItemIndex(index + 5);
+                        // history(`/channel/@me/${friend.id}`);
+                        handleClick(friend.id, index)
+                      }
+                    />
+                  </li>
+                );
+              })}
             </ul>
           </div>
         </div>

@@ -7,12 +7,24 @@ const MessageTag = ({
   simpleOption = false,
   textSrc,
   timePosted,
+  displayName,
 }) => {
   const messageType = {
     TEXT: "TEXT",
     IMAGE: "IMAGE",
   };
+  function parseDateTime(dateTimeString) {
+    const dateObj = new Date(dateTimeString);
 
+    const date = `${dateObj.getDate()}/${
+      dateObj.getMonth() + 1
+    }/${dateObj.getFullYear()}`;
+    const time = `${dateObj.getHours()} : ${dateObj.getMinutes()}`;
+
+    return { date, time };
+  }
+
+  const time = parseDateTime(timePosted);
   return (
     <>
       {simpleOption === false && <span className={styles.addSpace}></span>}
@@ -26,14 +38,16 @@ const MessageTag = ({
             {simpleOption === false ? (
               <SimpleAvatar />
             ) : (
-              <span className={styles.simpleTimePosted}>24 : 20</span>
+              <span className={styles.simpleTimePosted}>{time.time}</span>
             )}
           </div>
           <div className={styles.messageContent}>
             {simpleOption === false && (
               <div className={styles.messageHeader}>
-                <span className={styles.userName}>hokhanhduy_</span>
-                <span className={styles.timePosted}> 18/02/2024 16:15</span>
+                <span className={styles.userName}>{displayName}</span>
+                <span className={styles.timePosted}>
+                  {`${time.date} ${time.time}`}
+                </span>
               </div>
             )}
             <div className={styles.textMessage}>{textSrc}</div>

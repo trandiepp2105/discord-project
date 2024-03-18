@@ -1,5 +1,5 @@
 import { React, useEffect, useState, createContext } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, Outlet } from "react-router-dom";
 import styles from "./DashboardPage.module.css";
 import ServerBar from "../../components/server_bar/ServerBar";
 import SideBar from "../../components/side_bar/SideBar";
@@ -7,9 +7,13 @@ import SideBar from "../../components/side_bar/SideBar";
 import FriendRoom from "../friend_room/FriendRoom";
 import FriendChatRoom from "../friend_chat_room.jsx/FriendChatRoom";
 import TextChannelChatRoom from "../text_channel_chat_room/TextChannelChatRoom";
+import Cookies from "js-cookie";
 export const DashboardPageContext = createContext();
 
 const DashboardPage = () => {
+  // const accessToken = Cookies.get("access_token");
+
+  const [listFriends, setListFriends] = useState([]);
   const tabs = {
     FRIENDTABS: {
       ONLINE: "ONLINE",
@@ -39,35 +43,38 @@ const DashboardPage = () => {
     );
   }, [location]);
 
-  const MainPlace = (listArgUrl) => {
-    if (
-      (listArgUrl.length === 2 &&
-        listArgUrl.includes("channel") &&
-        listArgUrl.includes("@me")) ||
-      (listArgUrl.length === 3 &&
-        listArgUrl.includes("channel") &&
-        listArgUrl.includes("@me") &&
-        !listArgUrl[2])
-    ) {
-      return <FriendRoom />;
-    } else if (
-      listArgUrl.length === 3 &&
-      listArgUrl.includes("channel") &&
-      listArgUrl.includes("@me")
-    ) {
-      return <FriendChatRoom />;
-    } else if (
-      listArgUrl.length === 3 &&
-      listArgUrl.includes("channel") &&
-      listArgUrl[1] != "@me"
-    ) {
-      return <TextChannelChatRoom />;
-    } else {
-      return null; // return -1 if the list doesn't match either condition
-    }
-  };
+  // const MainPlace = (listArgUrl) => {
+  //   if (
+  //     (listArgUrl.length === 2 &&
+  //       listArgUrl.includes("channel") &&
+  //       listArgUrl.includes("@me")) ||
+  //     (listArgUrl.length === 3 &&
+  //       listArgUrl.includes("channel") &&
+  //       listArgUrl.includes("@me") &&
+  //       !listArgUrl[2])
+  //   ) {
+  //     return <FriendRoom />;
+  //   } else if (
+  //     (listArgUrl.length === 3) | (listArgUrl.length === 4) &&
+  //     listArgUrl.includes("channel") &&
+  //     listArgUrl.includes("@me")
+  //   ) {
+  //     return <FriendChatRoom />;
+  //   } else if (
+  //     listArgUrl.length === 3 &&
+  //     listArgUrl.includes("channel") &&
+  //     listArgUrl[1] != "@me"
+  //   ) {
+  //     return <TextChannelChatRoom />;
+  //   } else {
+  //     return null; // return -1 if the list doesn't match either condition
+  //   }
+  // };
+
   return (
-    <DashboardPageContext.Provider value={{ currentTab, setCurrentTab, tabs }}>
+    <DashboardPageContext.Provider
+      value={{ currentTab, setCurrentTab, tabs, listFriends, setListFriends }}
+    >
       <div className={styles.wapperPage}>
         <ServerBar />
         <div className={styles.base}>
@@ -77,7 +84,11 @@ const DashboardPage = () => {
             <SideBar ownChannel={false} />
           )}
 
-          <div className={styles.mainPlace}> {MainPlace(listArgUrl)}</div>
+          {/* <div className={styles.mainPlace}> {MainPlace(listArgUrl)}</div> */}
+          <div className={styles.mainPlace}>
+            {" "}
+            <Outlet />
+          </div>
         </div>
       </div>
     </DashboardPageContext.Provider>

@@ -1,4 +1,4 @@
-import { React, useEffect, useState, useContext } from "react";
+import { React, useEffect, useState, useContext, useRef } from "react";
 import classNames from "classnames";
 import styles from "./FriendRoom.module.css";
 import NavBar from "../../components/nav_bar/NavBar";
@@ -10,14 +10,24 @@ import axios from "axios";
 import Cookies from "js-cookie";
 
 const FriendRoom = () => {
-  const { currentTab, setCurrentTab, tabs } = useContext(DashboardPageContext);
-  const [enableAddFriendStatus, setEnableAddFriendStatus] = useState(false);
+  const { currentTab, setCurrentTab, tabs, listFriends, setListFriends } =
+    useContext(DashboardPageContext);
+  const [enableAddFriendStatusText, setEnableAddFriendStatusText] =
+    useState(false);
+  const [addFriendStatus, setAddFriendStatus] = useState("");
+  const [addFriendStatusText, setAddFriendStatusText] = useState("");
   const [addFriendBtnState, setAddFriendBtnState] = useState("enable");
-  const [listFriends, setListFriends] = useState([]);
+  const [listActions, setListActions] = useState([]);
+  // const [listFriends, setListFriends] = useState([]);
   const [data, setData] = useState({
     username: "",
   });
-
+  const inputRef = useRef(null);
+  const focusInput = () => {
+    // Đưa con trỏ chuột vào input
+    inputRef.current.focus();
+    inputRef.current.value = "";
+  };
   const handleAddFriendSubmit = (event) => {
     event.preventDefault();
     const endpoint = "http://127.0.0.1:8000/friendships/";
@@ -33,9 +43,20 @@ const FriendRoom = () => {
       })
       .then((response) => {
         console.log(response);
+        setEnableAddFriendStatusText(true);
+        setAddFriendStatus("success");
+        setData({});
+        focusInput();
+        setAddFriendStatusText(response.data.message);
       })
       .catch((error) => {
-        console.error("Send add friend request error: ", error);
+        console.error(
+          "Send add friend request error: ",
+          error.response.data.message
+        );
+        setAddFriendStatusText(error.response.data.message);
+        setEnableAddFriendStatusText(true);
+        setAddFriendStatus("failure");
       });
   };
 
@@ -44,18 +65,20 @@ const FriendRoom = () => {
     switch (tab) {
       case "ONLINE":
         endpoint = "http://127.0.0.1:8000/friendships/all/";
+        setListActions(["OPEN_CHAT", "MENU"]);
         break;
       case "ALL":
         endpoint = "http://127.0.0.1:8000/friendships/all/";
+        setListActions(["OPEN_CHAT", "MENU"]);
         break;
       case "WAITING":
         endpoint = "http://127.0.0.1:8000/friendships/pending/";
+        setListActions(["ACCEPT_REQUEST", "DELETE_REQUEST"]);
         break;
       case "BLOCKED":
         endpoint = "http://127.0.0.1:8000/friendships/blocked/";
+        setListActions(["UNBLOCK"]);
         break;
-      default:
-        endpoint = "http://127.0.0.1:8000/friendships/all/";
     }
     const accessToken = Cookies.get("access_token");
     axios
@@ -66,7 +89,6 @@ const FriendRoom = () => {
         },
       })
       .then((response) => {
-        console.log("data: ", response.data);
         setListFriends(response.data);
       })
       .catch((error) => {
@@ -74,23 +96,30 @@ const FriendRoom = () => {
       });
   };
 
+  const handleAcceptRequest = (friendId) => {
+    const accessToken = Cookies.get("access_token");
+    const endpoint = `http://127.0.0.1:8000/friendships/accept/${friendId}/`;
+    axios
+      .post(
+        endpoint,
+        {},
+        {
+          withCredentials: true,
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      )
+      .then((response) => {
+        console.log("accept res: ", response);
+      })
+      .catch((err) => console.log(err));
+  };
+
   useEffect(() => {
-    getListFriend(currentTab);
-    // const endpoint = "http://127.0.0.1:8000/friendships/pending/";
-    // const accessToken = Cookies.get("access_token");
-    // axios
-    //   .get(endpoint, {
-    //     withCredentials: true,
-    //     headers: {
-    //       Authorization: `Bearer ${accessToken}`,
-    //     },
-    //   })
-    //   .then((response) => {
-    //     console.log(response);
-    //   })
-    //   .catch((error) => {
-    //     console.error("Send add friend request error: ", error);
-    //   });
+    if (currentTab != "ADDFRIEND") {
+      getListFriend(currentTab);
+    }
   }, [currentTab]);
 
   useEffect(() => {
@@ -130,6 +159,10 @@ const FriendRoom = () => {
                       <PeopleItemContainer
                         userName={friend.username}
                         status={"Online"}
+                        actions={listActions}
+                        handleAcceptRequest={() => {
+                          handleAcceptRequest(friend.id);
+                        }}
                       />
                     </div>
                   );
@@ -166,6 +199,7 @@ const FriendRoom = () => {
                 >
                   <div className={styles.inputWrapper}>
                     <input
+                      ref={inputRef}
                       type="text"
                       name=""
                       id="add-friend-input"
@@ -203,16 +237,20 @@ const FriendRoom = () => {
                     Gửi Yêu Cầu Kết Bạn
                   </button>
                 </div>
-                {/* <div className={styles.addFriendStatus}>
-                  <p
-                    className={classNames(
-                      styles.successText,
-                      styles.statusText
-                    )}
-                  >
-                    Thành công! Yêu cầu kết bạn với hokhanhduy_ đã được gửi.
-                  </p>
-                </div> */}
+                {enableAddFriendStatusText && (
+                  <div className={styles.addFriendStatus}>
+                    <p
+                      className={classNames(
+                        addFriendStatus === "success"
+                          ? styles.successText
+                          : styles.failureText,
+                        styles.statusText
+                      )}
+                    >
+                      {addFriendStatusText}
+                    </p>
+                  </div>
+                )}
               </form>
             </div>
           )}

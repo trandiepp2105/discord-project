@@ -3,10 +3,9 @@ import styles from "./ChannelTextArea.module.css";
 import { AiFillPlusCircle } from "react-icons/ai";
 import { MdEmojiEmotions } from "react-icons/md";
 
-function AutoResizeTextarea({ handleInput }) {
+function AutoResizeTextarea({ handleInputChange, handleKeyDown, inputValue }) {
   const [rows, setRows] = useState(1);
   const textareaRef = useRef(null);
-
   useEffect(() => {
     const textarea = textareaRef.current;
     const resizeTextarea = () => {
@@ -40,12 +39,14 @@ function AutoResizeTextarea({ handleInput }) {
       ref={textareaRef}
       rows={rows}
       style={{ resize: "none", overflow: "hidden" }}
-      onChange={handleInput}
+      onChange={handleInputChange}
+      onKeyDown={handleKeyDown}
+      value={inputValue}
     />
   );
 }
 
-const ChannelTextArea = () => {
+const ChannelTextArea = ({ handleInputChange, handleKeyDown, inputValue }) => {
   return (
     <div className={styles.channelTextArea}>
       <div className={styles.scrollableContainer}>
@@ -53,7 +54,11 @@ const ChannelTextArea = () => {
           <button type="button" className={styles.attachButton}>
             <AiFillPlusCircle className={styles.attachIcon} />
           </button>
-          <AutoResizeTextarea />
+          <AutoResizeTextarea
+            handleInputChange={handleInputChange}
+            handleKeyDown={handleKeyDown}
+            inputValue={inputValue}
+          />
           <div className={styles.buttons}>
             <button className={styles.wrapperButton}>
               <img src="/images/gif.svg" alt="" className={styles.iconButton} />

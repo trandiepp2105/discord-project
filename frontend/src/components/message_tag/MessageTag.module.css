@@ -83,7 +83,8 @@
 .textMessage {
   flex: 1;
   font-size: 16px;
-  color: white;
+  color: var(--text-message);
+  font-family: "Exo 2", sans-serif;
   word-wrap: break-word;
 }
 

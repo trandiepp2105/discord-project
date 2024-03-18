@@ -1,10 +1,10 @@
 from rest_framework import serializers
-from .models import UserDiscord, Server, Channel, Member, FriendChatRoom, Friendship
+from .models import *
 
 class UserDiscordSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserDiscord
-        fields = ['username', 'email', 'password', 'is_verified', 'display_name', 'date_of_birth']
+        fields = ['id','username', 'email', 'password', 'is_verified', 'display_name', 'date_of_birth']
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
@@ -20,8 +20,9 @@ class FriendshipSerializer(serializers.ModelSerializer):
         fields = ('id', 'from_friend', 'to_friend', 'status', 'date_added')
 
 class LoginSerializer(serializers.Serializer):
-    username = serializers.CharField()
+    username = serializers.CharField(default=None)
     password = serializers.CharField()
+    email = serializers.EmailField(default=None)
 
 class ServerSerializer(serializers.Serializer):
     class Meta:
@@ -45,8 +46,24 @@ class CreateChannelSerializer(serializers.Serializer):
 class MemberSerializer(serializers.ModelSerializer):
     class Meta:
         model = Member
-        fields = ['user_id', 'server_id', 'role']
+        fields = '__all__'
 
     def create(self, validated_data):
         member = Member.objects.create(**validated_data)
         return member
+
+class MessageSerializer(serializers.ModelSerializer):
+    author = serializers.PrimaryKeyRelatedField(queryset=UserDiscord.objects.all())  # Sử dụng PrimaryKeyRelatedField để tham chiếu đến người gửi
+    class Meta:
+        model = Message
+        fields = ['id', 'room', 'channel', 'message', 'created_at', 'pinned', 'attachments', 'mention_everyone', 'mentions', 'author']
+    def to_representation(self, instance):
+        # Ghi đè phương thức này để bao gồm thông tin về người gửi trong dữ liệu đầu ra
+        data = super().to_representation(instance)
+        author_data = UserDiscordSerializer(instance.author).data  # Sử dụng UserSerializer để serialize thông tin về người gửi
+        data['author'] = author_data
+        return data
+class FriendChatRoomSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FriendChatRoom
+        fields = '__all__'

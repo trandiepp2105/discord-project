@@ -39,10 +39,26 @@
 }
 
 .wrapperAction {
+  width: 32px;
+  height: 32px;
   margin-left: 10px;
+  border: none;
+  outline: none;
+  /* background-color: inherit; */
+  background-color: #2b2d31;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .actionAvatar {
-  background-color: #2b2d31;
   cursor: pointer;
+  width: 18px;
+  object-fit: cover;
+  filter: var(--inactive-filter-icon);
+}
+
+.wrapperAction:hover .actionAvatar {
+  filter: var(--white-filter-icon);
 }

@@ -18,8 +18,8 @@ friendship_viewset = views.FriendshipViewSet.as_view({
 router = DefaultRouter()
 router.register(r'users', views.UserDiscordViewSet)
 router.register(r'friendships', views.FriendshipViewSet)
-
-
+router.register(r'messages', views.MessageViewSet)
+router.register(r'friend-chat-room', views.FriendChatRoomViewSet)
 urlpatterns = [
     path('', include(router.urls)),
     path('signup/', views.SignUp.as_view(), name='signup'),
@@ -31,5 +31,7 @@ urlpatterns = [
     # path('friend_chat/', include('friend_chat.urls')),
     path('friendships/block/<str:username>/', views.FriendshipViewSet.as_view({'post': 'block_friend'})),
     # path('friendships/pending/', views.FriendshipViewSet.as_view({'get': 'list_pending_requests'}), name='friendship-pending-requests'),
+    path('friendships/accept/<int:user_id>/', views.FriendshipViewSet.as_view({'post': 'accept_friend_request'}), name='accept_friend_request'),
     path('friendships/blocked/', views.FriendshipViewSet.as_view({'get': 'list_blocked_friends'}), name='friendship-blocked-friends'),
+    # path('friend-chat-room/:friend_id/', views.FriendshipViewSet.as_view({'get': 'retrieve'}), name='get_friend_chat_room'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

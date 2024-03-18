@@ -1,5 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Varela+Round&display=swap");
-
+@import url("https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,100..900;1,100..900&display=swap");
 html {
   height: 100%;
   overflow: hidden;
@@ -34,6 +34,8 @@ body,
   --focus-input: #48a8ff;
   --success-request: #42a554;
   --failure-request: #e54041;
+  --text-message: #9ea1a5;
+  --blob-color: #3b3d43;
 }
 /*
 ::-webkit-scrollbar {

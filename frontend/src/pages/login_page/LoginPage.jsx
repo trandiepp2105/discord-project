@@ -9,34 +9,48 @@ import FormButton from "../../components/form_button/FormButton";
 import Cookies from "js-cookie";
 const LoginPage = () => {
   const initialFormData = {
-    emailOrPhone: "",
+    username: "",
     password: "",
   };
   const [formData, setFormData] = useState(initialFormData);
   const checkInputFields = (formdata) => {
-    if (formdata.emailOrPhone && formdata.password) {
+    if (formdata.username && formdata.password) {
       return true;
     }
     return false;
   };
+
+  const isEmail = (inputStr) => {
+    var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (emailRegex.test(inputStr)) {
+      return true;
+    } else {
+      return false;
+    }
+  };
+
   const history = useNavigate();
   const handleSubmit = async (event) => {
     function sleep(ms) {
       return new Promise((resolve) => setTimeout(resolve, ms));
     }
     event.preventDefault();
-    console.log(formData);
     if (checkInputFields(formData)) {
       const endpoint = "http://127.0.0.1:8000/login/";
-      const data = {
-        username: formData.emailOrPhone,
-        password: formData.password,
-      };
+      const data = isEmail(formData.username)
+        ? {
+            email: formData.username,
+            password: formData.password,
+          }
+        : {
+            username: formData.username,
+            password: formData.password,
+          };
       console.log(data);
 
       axios
         .post(endpoint, data, {
-          withCredentials: true,
           headers: {
             "Content-Type": "application/json",
             // other headers if needed
@@ -81,10 +95,10 @@ const LoginPage = () => {
             </label>
             <InputField
               type={"text"}
-              id="email"
-              name={"email"}
+              id="username"
+              name={"text"}
               onChange={(event) => {
-                setFormData({ ...formData, emailOrPhone: event.target.value });
+                setFormData({ ...formData, username: event.target.value });
               }}
             />
           </div>

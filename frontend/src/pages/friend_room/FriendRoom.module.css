@@ -163,6 +163,10 @@
   color: var(--success-request);
 }
 
+.failureText {
+  color: var(--failure-request);
+}
+
 .searchBar {
   margin: 16px 20px 8px 30px;
   box-sizing: border-box;

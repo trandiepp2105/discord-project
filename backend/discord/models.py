@@ -1,6 +1,5 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from django.contrib.auth.models import User
 from PIL import Image
 
 
@@ -23,21 +22,6 @@ class UserDiscord(AbstractUser):
             output_size = (300, 300)
             img.thumbnail(output_size)
             img.save(self.user_picture.path)
-
-    # def get_friends(self):
-    #     return set(self.friendships_as_from_friend.all()).union(set(self.friendships_as_to_friend.all()))
-
-    # def add_friend(self, other_user):
-    #     if not self.is_friends_with(other_user):
-    #         friendship1 = Friend(user1=self, user2=other_user)
-    #         friendship2 = Friend(user1=other_user, user2=self)
-    #         friendship1.save()
-    #         friendship2.save()
-
-    # def is_friends_with(self, other_user):
-    #     friendships1 = Friend.objects.filter(user1=self, user2=other_user)
-    #     friendships2 = Friend.objects.filter(user1=other_user, user2=self)
-    #     return friendships1.exists() or friendships2.exists()
 
     class Meta:
         db_table = 'user'
@@ -76,13 +60,12 @@ class Friendship(models.Model):
         db_table = 'friendship'
 
 class Server(models.Model):
-    server_id = models.AutoField(primary_key=True)
     server_name = models.CharField(max_length=100)
-    # server_owner = models.ForeignKey(UserDiscord, on_delete=models.CASCADE)
+    owner = models.ForeignKey(UserDiscord, on_delete=models.CASCADE)
     date_created = models.DateTimeField(auto_now_add=True)
     server_picture = models.ImageField(upload_to='server_pictures/', blank=True, null=True, default='server_pictures/default.jpg')
-    # server_description = models.TextField(blank=True, null=True)
-
+    members = models.ManyToManyField(UserDiscord,
+                                     related_name='servers')
     def __str__(self):
         return self.server_name
 
@@ -98,10 +81,11 @@ class Member(models.Model):
         (MODERATOR, 'Moderator'),
         (MEMBER, 'Member')
     ]
-    user = models.ForeignKey(UserDiscord, on_delete=models.CASCADE)
+    user = models.OneToOneField(UserDiscord, on_delete=models.CASCADE, primary_key=True)
     server = models.ForeignKey(Server, on_delete=models.CASCADE)
-    date_joined = models.DateTimeField(auto_now_add=True)
+    joined_at = models.DateTimeField(auto_now_add=True)
     role = models.CharField(max_length=10, choices=ROLES, default=MEMBER)
+    server_permissions = models.CharField(max_length=100, null=True, blank=True)
 
     def __str__(self):
         return self.user.username
@@ -124,22 +108,22 @@ class Channel(models.Model):
         (TEXT, 'Text'),
         (VOICE, 'Voice')
     ]
-    channel_name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100)
     server = models.ForeignKey(Server, on_delete=models.CASCADE)
     members = models.ForeignKey(Member, on_delete=models.CASCADE)
     date_created = models.DateTimeField(auto_now_add=True)
     channel_type = models.CharField(max_length=5, choices=CHOOSES, default=TEXT)
     last_message = models.ForeignKey("Message", on_delete=models.CASCADE, related_name='last_message')
     channel_category = models.ForeignKey("ChannelCategory", on_delete=models.CASCADE, related_name='channel_category')
+    topic = models.CharField(max_length=100)
     def __str__(self):
-        return self.channel_name
+        return self.name
 
     class Meta:
         db_table = 'channel'
 
 
 class FriendChatRoom(models.Model):
-    room_id = models.AutoField(primary_key=True)
     user1 = models.ForeignKey(UserDiscord, on_delete=models.CASCADE, related_name='user1_id_chat')
     user2 = models.ForeignKey(UserDiscord, on_delete=models.CASCADE, related_name='user2_id_chat')
 
@@ -148,24 +132,58 @@ class FriendChatRoom(models.Model):
 
     class Meta:
         db_table = 'friend_chat'
+class Attachment(models.Model):
+    content_type = models.CharField(max_length=256)
+    duration_secs = models.DurationField(null=True, blank=True)
+    height = models.FloatField(blank=True, null=True)
+    width = models.FloatField(blank=True, null=True)
+    file_name = models.CharField(max_length=2048, default='file')
+    url = models.URLField()
+    def __str__(self):
+        return self.url
 
+    class Meta:
+        db_table = 'attachment'
 class Message(models.Model):
-    message_id = models.AutoField(primary_key=True)
-    user = models.ForeignKey(UserDiscord, on_delete=models.CASCADE)
     channel = models.ForeignKey(Channel, on_delete=models.CASCADE, blank=True, null=True)
     room = models.ForeignKey(FriendChatRoom, on_delete=models.CASCADE, blank=True, null=True)
-    # room is friend chat room
+    author = models.ForeignKey(UserDiscord, on_delete=models.CASCADE)
     message = models.TextField()
-    date_sent = models.DateTimeField(auto_now_add=True)
-
+    created_at = models.DateTimeField(auto_now_add=True)
+    pinned = models.BooleanField(default=False)
+    attachments  = models.ManyToManyField(Attachment, blank=True)
+    mention_everyone = models.BooleanField(default=False)
+    mentions = models.ManyToManyField('UserDiscord', related_name="mentioned_in", blank=True)
     def __str__(self):
-        return self.user.username + ' - ' + self.message + ' - ' + str(self.date_sent)
+        return self.author.username + ' - ' + self.message + ' - ' + str(self.created_at)
 
     class Meta:
         db_table = 'message'
 
+
+
+class Reaction(models.Model):
+    message = models.ForeignKey(Message, on_delete=models.CASCADE)
+    emoji = models.ForeignKey("Emoji", on_delete=models.CASCADE)
+    count = models.IntegerField()
+
+    def __str__(self):
+        return self.count
+
+    class Meta:
+        db_table = 'reaction'
+
+
+class Emoji(models.Model):
+    url = models.URLField()
+    name = models.CharField(max_length=100)
+    animated = models.BooleanField(default = False)
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        db_table = 'emoji'
 class LastSeen(models.Model):
-    last_seen_id = models.AutoField(primary_key=True)
     user = models.ForeignKey(UserDiscord, on_delete=models.CASCADE)
     channel = models.ForeignKey(Channel, on_delete=models.CASCADE, blank=True, null=True)
     room = models.ForeignKey(FriendChatRoom, on_delete=models.CASCADE, blank=True, null=True)
